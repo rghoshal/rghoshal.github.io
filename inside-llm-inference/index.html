@@ -1,0 +1,1417 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="..">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Inside an LLM Inference Engine - AI Engineering Handbook</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#inside-an-llm-inference-engine" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="AI Engineering Handbook" class="md-header__button md-logo" aria-label="AI Engineering Handbook" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI Engineering Handbook
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Inside an LLM Inference Engine
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AI Engineering Handbook" class="md-nav__button md-logo" aria-label="AI Engineering Handbook" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI Engineering Handbook
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM Fundamentals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    LLM Fundamentals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inside an LLM Inference Engine
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inside an LLM Inference Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-1-from-user-prompt-to-self-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 1 — From User Prompt to Self-Attention
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#learning-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Learning Objectives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-1-from-user-prompt-to-self-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter 1 — From User Prompt to Self-Attention
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#learning-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Learning Objectives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="inside-an-llm-inference-engine">Inside an LLM Inference Engine<a class="headerlink" href="#inside-an-llm-inference-engine" title="Permanent link">&para;</a></h1>
+<h3 id="chapter-1-from-user-prompt-to-self-attention">Chapter 1 — From User Prompt to Self-Attention<a class="headerlink" href="#chapter-1-from-user-prompt-to-self-attention" title="Permanent link">&para;</a></h3>
+<hr />
+<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
+<p>Large Language Models (LLMs) have rapidly become one of the most influential technologies driving modern Artificial Intelligence. Whether the task involves answering questions, summarizing documents, writing software, generating images, or assisting autonomous agents, every interaction with an LLM begins with a common objective: understanding the user's intent and producing the most appropriate response.</p>
+<p>Although the generated output often appears instantaneous, the underlying inference engine performs a remarkably sophisticated series of mathematical transformations before a single token is produced.</p>
+<p>This article begins a deep technical journey into that inference pipeline.</p>
+<p>Rather than treating an LLM as a mysterious black box, we will gradually uncover the computational mechanisms that transform an input prompt into meaningful output. Along the way we will explore the mathematical foundations of Transformers, understand why the <strong>Attention Is All You Need</strong> architecture revolutionized Natural Language Processing, and examine how modern LLMs perform inference.</p>
+<hr />
+<h2 id="learning-objectives">Learning Objectives<a class="headerlink" href="#learning-objectives" title="Permanent link">&para;</a></h2>
+<p>By the end of this article, you should understand:</p>
+<ul>
+<li>How an LLM interprets a user prompt.</li>
+<li>Why Transformers replaced earlier sequence models.</li>
+<li>The limitations of CNNs, RNNs, LSTMs, and GRUs.</li>
+<li>The motivation behind the Transformer architecture.</li>
+<li>How the self-attention mechanism works.</li>
+<li>How Query, Key, and Value vectors are computed.</li>
+<li>How scaled dot-product attention is calculated.</li>
+<li>Why multi-head attention is necessary.</li>
+<li>How positional encoding preserves word order.</li>
+</ul>
+<hr />
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
+<p>The article assumes a basic understanding of:</p>
+<ul>
+<li>Linear algebra</li>
+<li>Matrix multiplication</li>
+<li>Probability</li>
+<li>Neural Networks</li>
+<li>Basic Machine Learning concepts</li>
+</ul>
+<p>No prior knowledge of Transformers is required.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Background</li>
+<li>Natural Language Understanding</li>
+<li>Evolution of Sequence Models</li>
+<li>Convolutional Neural Networks (CNN)</li>
+<li>Recurrent Neural Networks (RNN)</li>
+<li>Long Short-Term Memory (LSTM)</li>
+<li>Gated Recurrent Units (GRU)</li>
+<li>Bidirectional LSTM</li>
+<li>Transformers</li>
+<li>Self-Attention</li>
+<li>Multi-Head Attention</li>
+<li>Positional Encoding</li>
+<li>Summary</li>
+<li>References</li>
+</ol>
+<hr />
+<h1 id="background">Background<a class="headerlink" href="#background" title="Permanent link">&para;</a></h1>
+<p>Large Language Models (LLMs) have become the computational foundation of modern Artificial Intelligence systems. They are increasingly integrated into software platforms to solve business problems ranging from conversational assistants and intelligent search to software development, autonomous agents, scientific research, and enterprise automation.</p>
+<p>The primary objective of an LLM is to generate the most appropriate output for a given input. Depending on the application, the input may take several forms.</p>
+<p>For example,</p>
+<blockquote>
+<p><strong>Question Answering</strong></p>
+</blockquote>
+<p>Imagine asking an LLM:</p>
+<blockquote>
+<p><em>"Who invented electricity?"</em></p>
+</blockquote>
+<p>The model analyzes the question, identifies the relevant concepts, retrieves contextual knowledge stored within its learned parameters, and generates a coherent response.</p>
+<hr />
+<blockquote>
+<p><strong>Task Execution</strong></p>
+</blockquote>
+<p>Consider an intelligent software agent instructed to:</p>
+<blockquote>
+<p><em>Find obsolete files and folders on a computer, remove temporary files, and generate a storage utilization report.</em></p>
+</blockquote>
+<p>In this case, the LLM is no longer generating only text. Instead, it plans and orchestrates a sequence of actions using external tools to accomplish the objective.</p>
+<hr />
+<blockquote>
+<p><strong>Multi-Agent Collaboration</strong></p>
+</blockquote>
+<p>Imagine an autonomous driving system where multiple intelligent agents communicate continuously.</p>
+<p>One agent observes road conditions.</p>
+<p>Another predicts pedestrian movement.</p>
+<p>A third plans vehicle trajectory.</p>
+<p>Yet another controls steering and braking.</p>
+<p>Collectively, these agents coordinate their decisions to safely navigate the vehicle.</p>
+<p>Although the applications differ significantly, they all rely upon the same underlying capability:</p>
+<blockquote>
+<p><strong>Understanding the meaning of an input before generating an appropriate output.</strong></p>
+</blockquote>
+<hr />
+<h2 id="what-happens-internally">What Happens Internally?<a class="headerlink" href="#what-happens-internally" title="Permanent link">&para;</a></h2>
+<p>Regardless of whether the input is</p>
+<ul>
+<li>a question,</li>
+<li>a command,</li>
+<li>a software task,</li>
+<li>or a sequence of autonomous actions,</li>
+</ul>
+<p>an LLM performs inference.</p>
+<p>Inference is the computational process through which the model converts the input into internal numerical representations, reasons over those representations, and gradually predicts the next most probable output token.</p>
+<p>At its core, inference consists of a sequence of mathematical operations executed across multiple layers of a Transformer neural network.</p>
+<p>These computations involve:</p>
+<ul>
+<li>tokenization,</li>
+<li>embedding generation,</li>
+<li>positional encoding,</li>
+<li>self-attention,</li>
+<li>feed-forward neural networks,</li>
+<li>normalization,</li>
+<li>probability estimation,</li>
+<li>and autoregressive decoding.</li>
+</ul>
+<p>The objective of this article is to understand these computations from first principles.</p>
+<hr />
+<blockquote>
+<p><strong>Note</strong></p>
+<p>Throughout this article we will focus exclusively on <strong>Natural Language Understanding (NLU)</strong> using textual prompts.</p>
+<p>Extensions to multimodal systems—including images, audio, and video—will be discussed in later articles once the underlying Transformer architecture has been established.</p>
+</blockquote>
+<hr />
+<h1 id="natural-language-understanding-nlu">Natural Language Understanding (NLU)<a class="headerlink" href="#natural-language-understanding-nlu" title="Permanent link">&para;</a></h1>
+<p>Natural Language Understanding (NLU) is the branch of Artificial Intelligence concerned with enabling machines to interpret and reason about human language.</p>
+<p>Within an LLM, every interaction begins with a prompt supplied by the user.</p>
+<p>A prompt may consist of:</p>
+<ul>
+<li>a single word,</li>
+<li>a sentence,</li>
+<li>several paragraphs,</li>
+<li>a programming task,</li>
+<li>or an entire conversation.</li>
+</ul>
+<p>Although humans perceive a prompt as ordinary language, an LLM cannot process words directly.</p>
+<p>Instead, the prompt must undergo a sequence of mathematical transformations before meaningful computation can begin.</p>
+<p>At a high level, this transformation pipeline consists of the following stages:</p>
+<ol>
+<li>Receive the textual prompt.</li>
+<li>Tokenize the input.</li>
+<li>Convert tokens into numerical embeddings.</li>
+<li>Inject positional information.</li>
+<li>Compute contextual relationships using self-attention.</li>
+<li>Generate contextual representations.</li>
+<li>Predict the next token.</li>
+<li>Repeat until the response is complete.</li>
+</ol>
+<p>Every stage in this pipeline is implemented using matrix operations executed by the Transformer architecture.</p>
+<hr />
+<h2 id="why-attention">Why "Attention"?<a class="headerlink" href="#why-attention" title="Permanent link">&para;</a></h2>
+<p>There is a reason this article repeatedly emphasizes the word <strong>Attention</strong>.</p>
+<p>In 2017, researchers at Google published one of the most influential papers in modern Deep Learning:</p>
+<blockquote>
+<p><strong>Attention Is All You Need</strong></p>
+</blockquote>
+<p>This work fundamentally changed the way sequence modelling is performed.</p>
+<p>Rather than processing words one after another—as earlier neural networks had done—the Transformer architecture introduced a mechanism that allows every word in a sentence to interact directly with every other word simultaneously.</p>
+<p>This mechanism became known as <strong>Self-Attention</strong>.</p>
+<p>Modern LLMs—including GPT, Claude, Gemini, Llama, DeepSeek, and many others—are all built upon this fundamental principle.</p>
+<p>Before we study Transformers, however, it is useful to understand the sequence models that preceded them and the limitations that ultimately motivated the development of the Transformer architecture.</p>
+<hr />
+<h1 id="evolution-of-sequence-models">Evolution of Sequence Models<a class="headerlink" href="#evolution-of-sequence-models" title="Permanent link">&para;</a></h1>
+<p>Before the introduction of Transformers, sequence modelling relied primarily on several families of neural networks.</p>
+<p>Each successive architecture attempted to overcome limitations present in its predecessors.</p>
+<p>The major evolutionary stages are:</p>
+<ul>
+<li>Convolutional Neural Networks (CNN)</li>
+<li>Recurrent Neural Networks (RNN)</li>
+<li>Long Short-Term Memory (LSTM)</li>
+<li>Gated Recurrent Units (GRU)</li>
+<li>Bidirectional LSTM</li>
+</ul>
+<h1 id="evolution-of-sequence-models_1">Evolution of Sequence Models<a class="headerlink" href="#evolution-of-sequence-models_1" title="Permanent link">&para;</a></h1>
+<p>Before the introduction of Transformers, sequence modelling was dominated by several families of neural networks, each designed to overcome the shortcomings of its predecessors.</p>
+<p>Every architecture contributed an important advancement to the field of Deep Learning, yet each also introduced limitations that eventually motivated the development of the Transformer.</p>
+<p>The progression can be summarized as follows:</p>
+<pre><code>CNN → RNN → LSTM → GRU → Bidirectional LSTM → Transformer
+</code></pre>
+<p>Each model addressed a different aspect of learning from sequential data. Understanding these architectures helps us appreciate why the Transformer represented such a significant leap forward.</p>
+<hr />
+<h2 id="convolutional-neural-networks-cnn">Convolutional Neural Networks (CNN)<a class="headerlink" href="#convolutional-neural-networks-cnn" title="Permanent link">&para;</a></h2>
+<p>Convolutional Neural Networks (CNNs) were originally developed for processing grid-like data such as images. Their remarkable ability to extract local spatial features made them the dominant architecture for computer vision tasks.</p>
+<p>Rather than processing every pixel independently, CNNs apply small learnable filters across an image. These filters detect meaningful patterns such as edges, textures, corners, and shapes.</p>
+<p>The mathematical operation that drives a CNN is <strong>convolution</strong>.</p>
+<p>The convolution operation can be represented as</p>
+<p>$$
+S(i,j)
+=
+(I*K)(i,j)
+=
+\sum_{m}\sum_{n}
+I(i-m,j-n)K(m,n)
+$$</p>
+<p>where</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$$I$$</td>
+<td>Input image</td>
+</tr>
+<tr>
+<td>$$K$$</td>
+<td>Convolution kernel (filter)</td>
+</tr>
+<tr>
+<td>$$S$$</td>
+<td>Output feature map</td>
+</tr>
+<tr>
+<td>$$M \times N$$</td>
+<td>Kernel dimensions</td>
+</tr>
+</tbody>
+</table>
+<p>The convolution filter slides over the input image and performs localized dot products between the kernel and the corresponding image region.</p>
+<p>The resulting feature map highlights characteristics that are important for the task being performed.</p>
+<p>Typical examples include</p>
+<ul>
+<li>edges</li>
+<li>corners</li>
+<li>textures</li>
+<li>shapes</li>
+<li>repetitive visual patterns</li>
+</ul>
+<p>CNNs have been extremely successful in</p>
+<ul>
+<li>Image Classification</li>
+<li>Object Detection</li>
+<li>Face Recognition</li>
+<li>Medical Imaging</li>
+<li>Autonomous Driving</li>
+</ul>
+<h3 id="advantages">Advantages<a class="headerlink" href="#advantages" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Excellent at extracting local features.</li>
+<li>Translation invariant.</li>
+<li>Computationally efficient.</li>
+<li>Highly parallelizable.</li>
+</ul>
+<h3 id="limitations">Limitations<a class="headerlink" href="#limitations" title="Permanent link">&para;</a></h3>
+<p>Despite their success in computer vision, CNNs are not naturally suited for modelling long-range dependencies in language.</p>
+<p>A convolution filter only observes a limited neighborhood of the input.</p>
+<p>Capturing relationships between words that are far apart in a sentence requires many convolutional layers, making language modelling inefficient.</p>
+<hr />
+<h2 id="recurrent-neural-networks-rnn">Recurrent Neural Networks (RNN)<a class="headerlink" href="#recurrent-neural-networks-rnn" title="Permanent link">&para;</a></h2>
+<p>Unlike CNNs, Recurrent Neural Networks were specifically designed for sequential data.</p>
+<p>Instead of processing every input independently, an RNN maintains an internal hidden state that carries information from previous time steps.</p>
+<p>Conceptually,</p>
+<pre><code>Word1 → Word2 → Word3 → Word4 → ...
+</code></pre>
+<p>Each word depends upon the computations performed for all previous words.</p>
+<p>This enables the network to model temporal relationships.</p>
+<p>RNNs compute</p>
+<ul>
+<li>current input</li>
+<li>previous hidden state</li>
+<li>updated hidden state</li>
+</ul>
+<p>at every time step.</p>
+<p>This makes them suitable for</p>
+<ul>
+<li>Natural Language Processing</li>
+<li>Speech Recognition</li>
+<li>Time-Series Forecasting</li>
+<li>Machine Translation</li>
+</ul>
+<h3 id="common-rnn-architectures">Common RNN Architectures<a class="headerlink" href="#common-rnn-architectures" title="Permanent link">&para;</a></h3>
+<p>RNNs are commonly categorized according to the relationship between their inputs and outputs.</p>
+<h4 id="one-to-one">One-to-One<a class="headerlink" href="#one-to-one" title="Permanent link">&para;</a></h4>
+<p>One input produces one output.</p>
+<p>Example:</p>
+<ul>
+<li>Image Classification</li>
+</ul>
+<hr />
+<h4 id="one-to-many">One-to-Many<a class="headerlink" href="#one-to-many" title="Permanent link">&para;</a></h4>
+<p>One input produces multiple outputs.</p>
+<p>Example:</p>
+<ul>
+<li>Image Captioning</li>
+</ul>
+<hr />
+<h4 id="many-to-one">Many-to-One<a class="headerlink" href="#many-to-one" title="Permanent link">&para;</a></h4>
+<p>Multiple sequential inputs produce one output.</p>
+<p>Example:</p>
+<ul>
+<li>Sentiment Analysis</li>
+</ul>
+<hr />
+<h4 id="many-to-many">Many-to-Many<a class="headerlink" href="#many-to-many" title="Permanent link">&para;</a></h4>
+<p>Multiple sequential inputs produce multiple sequential outputs.</p>
+<p>Example:</p>
+<ul>
+<li>Language Translation</li>
+</ul>
+<hr />
+<h3 id="advantages_1">Advantages<a class="headerlink" href="#advantages_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Captures sequential information.</li>
+<li>Maintains contextual memory.</li>
+<li>Naturally models temporal dependencies.</li>
+</ul>
+<h3 id="limitations_1">Limitations<a class="headerlink" href="#limitations_1" title="Permanent link">&para;</a></h3>
+<p>Because computation is inherently sequential,</p>
+<pre><code>Word 1
+ ↓
+Word 2
+ ↓
+Word 3
+ ↓
+Word 4
+</code></pre>
+<p>each word must wait until the previous word has been processed.</p>
+<p>This severely limits parallel execution on modern GPUs.</p>
+<p>Even more importantly, RNNs suffer from the <strong>vanishing gradient</strong> and <strong>exploding gradient</strong> problems.</p>
+<p>As sequences become longer, gradients either shrink towards zero or grow uncontrollably, preventing effective learning.</p>
+<p>This makes it difficult for an RNN to remember information occurring many time steps in the past.</p>
+<hr />
+<h2 id="long-short-term-memory-networks-lstm">Long Short-Term Memory Networks (LSTM)<a class="headerlink" href="#long-short-term-memory-networks-lstm" title="Permanent link">&para;</a></h2>
+<p>Long Short-Term Memory (LSTM) networks were introduced to overcome the memory limitations of traditional RNNs.</p>
+<p>Rather than relying upon a single hidden state, an LSTM introduces a memory cell capable of selectively retaining or discarding information.</p>
+<p>The architecture contains three gating mechanisms.</p>
+<h3 id="forget-gate">Forget Gate<a class="headerlink" href="#forget-gate" title="Permanent link">&para;</a></h3>
+<p>Determines which information should be discarded.</p>
+<hr />
+<h3 id="input-gate">Input Gate<a class="headerlink" href="#input-gate" title="Permanent link">&para;</a></h3>
+<p>Determines what new information should be stored.</p>
+<hr />
+<h3 id="output-gate">Output Gate<a class="headerlink" href="#output-gate" title="Permanent link">&para;</a></h3>
+<p>Determines what information should be propagated to the next time step.</p>
+<hr />
+<p>Together, these gates enable the network to preserve important contextual information across much longer sequences.</p>
+<p>LSTMs became the dominant architecture for sequence modelling before the arrival of Transformers.</p>
+<p>Applications include</p>
+<ul>
+<li>Language Modelling</li>
+<li>Speech Recognition</li>
+<li>Machine Translation</li>
+<li>Time-Series Forecasting</li>
+<li>Healthcare Analytics</li>
+</ul>
+<h3 id="advantages_2">Advantages<a class="headerlink" href="#advantages_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Learns long-term dependencies.</li>
+<li>Significantly reduces the vanishing gradient problem.</li>
+<li>Robust across many sequential learning tasks.</li>
+</ul>
+<h3 id="limitations_2">Limitations<a class="headerlink" href="#limitations_2" title="Permanent link">&para;</a></h3>
+<p>LSTMs still process data sequentially.</p>
+<p>Although memory is improved, computation remains difficult to parallelize.</p>
+<p>Training therefore becomes increasingly expensive as sequence length grows.</p>
+<hr />
+<h2 id="gated-recurrent-units-gru">Gated Recurrent Units (GRU)<a class="headerlink" href="#gated-recurrent-units-gru" title="Permanent link">&para;</a></h2>
+<p>Gated Recurrent Units simplify the LSTM architecture while retaining much of its performance.</p>
+<p>Instead of three gates, a GRU employs only two.</p>
+<h3 id="update-gate">Update Gate<a class="headerlink" href="#update-gate" title="Permanent link">&para;</a></h3>
+<p>Controls how much past information should be retained.</p>
+<hr />
+<h3 id="reset-gate">Reset Gate<a class="headerlink" href="#reset-gate" title="Permanent link">&para;</a></h3>
+<p>Controls how much historical information should be ignored when computing the new hidden state.</p>
+<hr />
+<p>Because GRUs contain fewer parameters,</p>
+<ul>
+<li>fewer matrix multiplications</li>
+<li>lower memory usage</li>
+<li>faster training</li>
+<li>faster inference</li>
+</ul>
+<p>they are often preferred in applications where computational efficiency is important.</p>
+<h3 id="advantages_3">Advantages<a class="headerlink" href="#advantages_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Simpler than LSTMs.</li>
+<li>Faster training.</li>
+<li>Lower computational complexity.</li>
+<li>Comparable performance in many NLP tasks.</li>
+</ul>
+<h3 id="limitations_3">Limitations<a class="headerlink" href="#limitations_3" title="Permanent link">&para;</a></h3>
+<p>Although computationally cheaper, GRUs remain fundamentally sequential and therefore cannot exploit the massive parallelism available on modern GPU architectures.</p>
+<hr />
+<h2 id="bidirectional-lstm">Bidirectional LSTM<a class="headerlink" href="#bidirectional-lstm" title="Permanent link">&para;</a></h2>
+<p>A Bidirectional LSTM extends the standard LSTM by processing a sequence in both directions simultaneously.</p>
+<pre><code>Forward Pass
+Word1 → Word2 → Word3 → Word4
+
+Backward Pass
+Word1 ← Word2 ← Word3 ← Word4
+</code></pre>
+<p>The final representation combines information from both directions.</p>
+<p>This enables every word to incorporate context from</p>
+<ul>
+<li>preceding words</li>
+<li>succeeding words</li>
+</ul>
+<p>Applications include</p>
+<ul>
+<li>Named Entity Recognition (NER)</li>
+<li>Part-of-Speech Tagging</li>
+<li>Question Answering</li>
+<li>Machine Translation</li>
+</ul>
+<p>Although Bidirectional LSTMs significantly improve contextual understanding, they still inherit the fundamental limitations of recurrent computation.</p>
+<p>Every token depends upon computations performed at previous time steps, preventing efficient parallel execution.</p>
+<hr />
+<h2 id="why-a-new-architecture-was-needed">Why a New Architecture Was Needed<a class="headerlink" href="#why-a-new-architecture-was-needed" title="Permanent link">&para;</a></h2>
+<p>By the mid-2010s, researchers had reached several important conclusions.</p>
+<p>Although RNNs, LSTMs, GRUs, and Bidirectional LSTMs achieved impressive results, they all shared a common bottleneck.</p>
+<p>They processed sequences <strong>one token at a time</strong>.</p>
+<p>This imposed three major limitations.</p>
+<ol>
+<li>
+<p>Limited parallelism.</p>
+</li>
+<li>
+<p>Difficulty learning long-range dependencies.</p>
+</li>
+<li>
+<p>Increasing computational cost as sequence length grew.</p>
+</li>
+</ol>
+<p>Modern GPUs are designed to execute thousands of independent operations simultaneously.</p>
+<p>Sequential neural networks were fundamentally incompatible with this hardware model.</p>
+<p>Researchers therefore began searching for an architecture capable of processing <strong>every token in a sentence simultaneously</strong> while still preserving contextual understanding.</p>
+<p>That search culminated in one of the most influential papers in Artificial Intelligence:</p>
+<blockquote>
+<p><strong>Attention Is All You Need</strong></p>
+</blockquote>
+<p>The architecture introduced in that paper became known as the <strong>Transformer</strong>, and it forms the computational foundation of virtually every modern Large Language Model.</p>
+<p>In the next section, we will examine how the Transformer fundamentally redefined sequence modelling through the introduction of the <strong>self-attention mechanism</strong>.</p>
+<h1 id="transformers">Transformers<a class="headerlink" href="#transformers" title="Permanent link">&para;</a></h1>
+<p>The publication of the paper <strong>"Attention Is All You Need"</strong> by Vaswani <em>et al.</em> in 2017 marked one of the most significant milestones in the history of Artificial Intelligence. It introduced an entirely new neural network architecture—the <strong>Transformer</strong>—that fundamentally changed the way machines process sequential information.</p>
+<p>Unlike earlier sequence models, Transformers abandoned recurrent computation altogether. Instead of processing one token after another, the Transformer processes <strong>every token in the input sequence simultaneously</strong>, allowing modern hardware such as GPUs and TPUs to exploit massive parallelism during both training and inference.</p>
+<p>This architectural shift dramatically reduced training time while simultaneously improving the model's ability to capture long-range dependencies between words.</p>
+<p>Today, nearly every modern Large Language Model—including GPT, Claude, Gemini, Llama, DeepSeek, Mistral, and Qwen—is built upon the Transformer architecture.</p>
+<hr />
+<h2 id="why-transformers">Why Transformers?<a class="headerlink" href="#why-transformers" title="Permanent link">&para;</a></h2>
+<p>To appreciate why the Transformer represented such a revolutionary step, let us revisit the primary limitation shared by all previous sequence models.</p>
+<p>Consider the sentence</p>
+<blockquote>
+<p><em>The quick brown fox jumps over the lazy dog.</em></p>
+</blockquote>
+<p>An RNN processes this sentence as</p>
+<pre><code>The
+ ↓
+quick
+ ↓
+brown
+ ↓
+fox
+ ↓
+jumps
+ ↓
+over
+ ↓
+the
+ ↓
+lazy
+ ↓
+dog
+</code></pre>
+<p>Each word must wait until the previous word has been processed.</p>
+<p>Consequently,</p>
+<ul>
+<li>computation cannot be parallelized,</li>
+<li>long-term dependencies become increasingly difficult to learn,</li>
+<li>training time grows with sequence length.</li>
+</ul>
+<p>The Transformer eliminates this sequential dependency.</p>
+<p>Instead, every token is processed simultaneously.</p>
+<pre><code>The      quick      brown      fox
+   \        |         |        /
+      Every token attends to every other token
+   /        |         |        \
+jumps     over      the      lazy      dog
+</code></pre>
+<p>This ability to model relationships between all words at once forms the foundation of the <strong>self-attention mechanism</strong>.</p>
+<hr />
+<h2 id="high-level-transformer-architecture">High-Level Transformer Architecture<a class="headerlink" href="#high-level-transformer-architecture" title="Permanent link">&para;</a></h2>
+<p>At a conceptual level, the original Transformer consists of two major components.</p>
+<pre><code>                Input Sentence
+                      │
+                      ▼
+             Input Embeddings
+                      │
+                      ▼
+           Positional Encoding
+                      │
+                      ▼
+          ┌─────────────────────┐
+          │     Encoder Stack   │
+          └─────────────────────┘
+                      │
+              Contextual Memory
+                      │
+                      ▼
+          ┌─────────────────────┐
+          │     Decoder Stack   │
+          └─────────────────────┘
+                      │
+                      ▼
+              Predicted Output
+</code></pre>
+<p>The encoder converts the input sequence into a rich contextual representation.</p>
+<p>The decoder uses this representation to generate the output sequence one token at a time.</p>
+<p>Although the original Transformer consists of both encoders and decoders, modern LLMs adopt different variants depending upon their intended purpose.</p>
+<p>For example,</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Architecture</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BERT</td>
+<td>Encoder Only</td>
+</tr>
+<tr>
+<td>GPT</td>
+<td>Decoder Only</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>Encoder–Decoder</td>
+</tr>
+<tr>
+<td>BART</td>
+<td>Encoder–Decoder</td>
+</tr>
+<tr>
+<td>Claude</td>
+<td>Decoder Only</td>
+</tr>
+<tr>
+<td>Gemini</td>
+<td>Decoder Only</td>
+</tr>
+<tr>
+<td>Llama</td>
+<td>Decoder Only</td>
+</tr>
+</tbody>
+</table>
+<p>Despite these architectural variations, they all rely upon one common computational primitive:</p>
+<blockquote>
+<p><strong>Self-Attention</strong></p>
+</blockquote>
+<hr />
+<h1 id="self-attention">Self-Attention<a class="headerlink" href="#self-attention" title="Permanent link">&para;</a></h1>
+<p>Self-attention is the computational mechanism that allows every token in a sequence to determine how strongly it should relate to every other token.</p>
+<p>Rather than considering only neighboring words, each token can directly examine the entire input sequence.</p>
+<p>Consider the sentence</p>
+<blockquote>
+<p><em>The animal didn't cross the street because </em><em>it</em><em> was tired.</em></p>
+</blockquote>
+<p>To correctly interpret the word <strong>it</strong>, the model must determine whether <strong>it</strong> refers to</p>
+<ul>
+<li>the animal, or</li>
+<li>the street.</li>
+</ul>
+<p>Humans solve this effortlessly because we understand context.</p>
+<p>Transformers solve the same problem mathematically using self-attention.</p>
+<p>Each word computes a numerical relationship with every other word in the sentence.</p>
+<p>These relationships become known as <strong>attention scores</strong>.</p>
+<p>Words receiving larger attention scores contribute more strongly to the final representation of the current token.</p>
+<hr />
+<h2 id="the-querykeyvalue-qkv-mechanism">The Query–Key–Value (QKV) Mechanism<a class="headerlink" href="#the-querykeyvalue-qkv-mechanism" title="Permanent link">&para;</a></h2>
+<p>The self-attention mechanism is built around three mathematical representations for every token.</p>
+<ul>
+<li>Query (Q)</li>
+<li>Key (K)</li>
+<li>Value (V)</li>
+</ul>
+<p>The terminology originates from information retrieval systems.</p>
+<p>Imagine searching for a book in a library.</p>
+<ul>
+<li>The <strong>Query</strong> represents what you are searching for.</li>
+<li>The <strong>Key</strong> describes the characteristics of every available book.</li>
+<li>The <strong>Value</strong> contains the actual contents of the selected book.</li>
+</ul>
+<p>The retrieval system compares your query against every key.</p>
+<p>The closest matching keys identify which values should be retrieved.</p>
+<p>Transformers perform exactly the same operation, except that the comparison is carried out using matrix multiplication instead of database lookups.</p>
+<hr />
+<h2 id="computing-query-key-and-value">Computing Query, Key, and Value<a class="headerlink" href="#computing-query-key-and-value" title="Permanent link">&para;</a></h2>
+<p>Every input token first passes through the embedding layer.</p>
+<p>The resulting embedding matrix is denoted by</p>
+<p>$$
+X
+$$</p>
+<p>Rather than using the embedding directly, the Transformer projects this embedding into three different vector spaces.</p>
+<p>These projections are computed using three independent learnable weight matrices.</p>
+<p>The mathematical formulation is</p>
+<p>$$
+Q=XW_Q,\qquad
+K=XW_K,\qquad
+V=XW_V
+$$</p>
+<p>where</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$$X \in \mathbb{R}^{n \times d_{model}}$$</td>
+<td>Input embedding matrix</td>
+</tr>
+<tr>
+<td>$$W_Q \in \mathbb{R}^{d_{model}\times d_k}$$</td>
+<td>Learnable query projection matrix</td>
+</tr>
+<tr>
+<td>$$W_K \in \mathbb{R}^{d_{model}\times d_k}$$</td>
+<td>Learnable key projection matrix</td>
+</tr>
+<tr>
+<td>$$W_V \in \mathbb{R}^{d_{model}\times d_v}$$</td>
+<td>Learnable value projection matrix</td>
+</tr>
+<tr>
+<td>$$Q$$</td>
+<td>Query matrix</td>
+</tr>
+<tr>
+<td>$$K$$</td>
+<td>Key matrix</td>
+</tr>
+<tr>
+<td>$$V$$</td>
+<td>Value matrix</td>
+</tr>
+</tbody>
+</table>
+<p>Notice that every token produces <strong>three different vector representations</strong>.</p>
+<p>These vectors encode different aspects of the same token.</p>
+<p>The Query asks:</p>
+<blockquote>
+<p><em>What information am I looking for?</em></p>
+</blockquote>
+<p>The Key answers:</p>
+<blockquote>
+<p><em>What information do I contain?</em></p>
+</blockquote>
+<p>The Value represents:</p>
+<blockquote>
+<p><em>What information should I contribute if selected?</em></p>
+</blockquote>
+<p>The next step is to compare every Query against every Key.</p>
+<p>This comparison produces the raw attention scores that determine how strongly tokens should influence one another.</p>
+<h1 id="computing-scaled-dot-product-attention">Computing Scaled Dot-Product Attention<a class="headerlink" href="#computing-scaled-dot-product-attention" title="Permanent link">&para;</a></h1>
+<p>The Query, Key, and Value matrices by themselves do not establish any relationship between the tokens in a sentence. They merely represent three different learned projections of the input embeddings.</p>
+<p>The next objective is to determine <strong>how strongly each token should attend to every other token</strong> in the sequence.</p>
+<p>This process is performed in four distinct computational stages.</p>
+<hr />
+<h2 id="step-1-compute-similarity-scores">Step 1 — Compute Similarity Scores<a class="headerlink" href="#step-1-compute-similarity-scores" title="Permanent link">&para;</a></h2>
+<p>The first step is to measure the similarity between every <strong>Query</strong> vector and every <strong>Key</strong> vector.</p>
+<p>Mathematically, this is achieved by multiplying the Query matrix with the transpose of the Key matrix.</p>
+<p>$$
+QK^{T}
+$$</p>
+<p>The result is known as the <strong>attention score matrix</strong>.</p>
+<p>Each element of this matrix represents the similarity between one query vector and one key vector.</p>
+<p>For example,</p>
+<table>
+<thead>
+<tr>
+<th>Query Token</th>
+<th>Key Token</th>
+<th style="text-align: right;">Attention Score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"The"</td>
+<td>"animal"</td>
+<td style="text-align: right;">0.73</td>
+</tr>
+<tr>
+<td>"The"</td>
+<td>"street"</td>
+<td style="text-align: right;">0.11</td>
+</tr>
+<tr>
+<td>"The"</td>
+<td>"tired"</td>
+<td style="text-align: right;">0.08</td>
+</tr>
+</tbody>
+</table>
+<p>Higher values indicate greater semantic relevance.</p>
+<p>Lower values indicate weaker relationships.</p>
+<hr />
+<h3 id="why-a-dot-product">Why a Dot Product?<a class="headerlink" href="#why-a-dot-product" title="Permanent link">&para;</a></h3>
+<p>The dot product provides an efficient mathematical measure of similarity between two vectors.</p>
+<p>Given two vectors</p>
+<p>$$
+\mathbf{a}
+\quad\text{and}\quad
+\mathbf{b}
+$$</p>
+<p>their dot product is</p>
+<p>$$
+\mathbf{a}\cdot\mathbf{b}
+=
+\sum_{i=1}^{d}
+a_i b_i
+$$</p>
+<p>If the vectors point in similar directions, the dot product becomes large.</p>
+<p>If the vectors are unrelated, the dot product becomes smaller.</p>
+<p>If they point in opposite directions, the dot product may even become negative.</p>
+<p>Consequently, the matrix</p>
+<p>$$
+QK^T
+$$</p>
+<p>contains a numerical estimate of how strongly every token should interact with every other token.</p>
+<hr />
+<h2 id="step-2-scale-the-attention-scores">Step 2 — Scale the Attention Scores<a class="headerlink" href="#step-2-scale-the-attention-scores" title="Permanent link">&para;</a></h2>
+<p>Although the dot product provides an excellent similarity measure, it introduces an important numerical problem.</p>
+<p>As the dimensionality of the vectors increases, the magnitude of the dot products also increases.</p>
+<p>Large numerical values cause the softmax function to become excessively peaked, assigning almost all probability mass to a single token while suppressing the contributions of the remaining tokens.</p>
+<p>This makes optimization unstable and slows learning.</p>
+<p>To mitigate this effect, the Transformer scales the attention scores by the square root of the key dimension.</p>
+<p>$$
+\frac{QK^T}{\sqrt{d_k}}
+$$</p>
+<p>where</p>
+<p>$$
+d_k
+$$</p>
+<p>denotes the dimensionality of the key vectors.</p>
+<hr />
+<h3 id="why-divide-by-sqrtd_k">Why Divide by $$\sqrt{d_k}$$?<a class="headerlink" href="#why-divide-by-sqrtd_k" title="Permanent link">&para;</a></h3>
+<p>Suppose</p>
+<pre><code>d_k = 64
+</code></pre>
+<p>Then</p>
+<p>$$
+\sqrt{d_k}=8
+$$</p>
+<p>Every attention score is divided by</p>
+<pre><code>8
+</code></pre>
+<p>before applying the softmax function.</p>
+<p>This normalization prevents the exponential function inside softmax from becoming numerically unstable.</p>
+<p>As a result,</p>
+<ul>
+<li>gradients remain well behaved,</li>
+<li>training becomes more stable,</li>
+<li>convergence becomes faster.</li>
+</ul>
+<hr />
+<h2 id="step-3-convert-scores-into-probabilities">Step 3 — Convert Scores into Probabilities<a class="headerlink" href="#step-3-convert-scores-into-probabilities" title="Permanent link">&para;</a></h2>
+<p>The scaled attention scores are still arbitrary numerical values.</p>
+<p>They must now be converted into probabilities.</p>
+<p>This transformation is performed by the <strong>softmax</strong> function.</p>
+<p>$$
+\operatorname{softmax}
+\left(
+\frac{QK^T}{\sqrt{d_k}}
+\right)
+$$</p>
+<p>The softmax function transforms every row of the attention score matrix into a probability distribution.</p>
+<p>Every value now satisfies</p>
+<p>$$
+0 \le p_i \le 1
+$$</p>
+<p>and</p>
+<p>$$
+\sum_i p_i = 1
+$$</p>
+<p>Each row therefore answers the question</p>
+<blockquote>
+<p><strong>How much attention should this token pay to every other token?</strong></p>
+</blockquote>
+<p>For example,</p>
+<table>
+<thead>
+<tr>
+<th>Token</th>
+<th style="text-align: right;">Attention Weight</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>animal</td>
+<td style="text-align: right;">0.72</td>
+</tr>
+<tr>
+<td>street</td>
+<td style="text-align: right;">0.08</td>
+</tr>
+<tr>
+<td>tired</td>
+<td style="text-align: right;">0.20</td>
+</tr>
+</tbody>
+</table>
+<p>The token <strong>animal</strong> receives the highest attention weight and therefore contributes most strongly to the contextual representation.</p>
+<hr />
+<h2 id="step-4-compute-the-final-contextual-representation">Step 4 — Compute the Final Contextual Representation<a class="headerlink" href="#step-4-compute-the-final-contextual-representation" title="Permanent link">&para;</a></h2>
+<p>The final step is to use these attention weights to combine the information stored in the <strong>Value</strong> matrix.</p>
+<p>This is accomplished by multiplying the attention probability matrix with the Value matrix.</p>
+<p>$$
+\operatorname{softmax}
+\left(
+\frac{QK^T}{\sqrt{d_k}}
+\right)V
+$$</p>
+<p>Notice that the attention weights themselves do not contain semantic information.</p>
+<p>They merely determine <strong>how much</strong> of each value vector should be incorporated into the final output.</p>
+<p>The Value matrix supplies the actual information.</p>
+<p>Consequently,</p>
+<p>tokens receiving larger attention weights contribute more strongly to the resulting contextual representation.</p>
+<hr />
+<h2 id="putting-everything-together">Putting Everything Together<a class="headerlink" href="#putting-everything-together" title="Permanent link">&para;</a></h2>
+<p>Combining all four computational stages yields the complete scaled dot-product attention equation.</p>
+<p>$$
+\operatorname{Attention}(Q,K,V)
+=
+\operatorname{softmax}
+\left(
+\frac{QK^T}
+{\sqrt{d_k}}
+\right)
+V
+$$</p>
+<p>This elegant equation lies at the heart of every modern Transformer architecture.</p>
+<p>Although remarkably compact, it performs four sophisticated operations simultaneously.</p>
+<ol>
+<li>
+<p>Computes semantic similarity between every pair of tokens.</p>
+</li>
+<li>
+<p>Normalizes those similarities to maintain numerical stability.</p>
+</li>
+<li>
+<p>Converts the similarities into probability distributions.</p>
+</li>
+<li>
+<p>Produces contextualized token representations by computing weighted combinations of the Value vectors.</p>
+</li>
+</ol>
+<p>It is this mechanism that enables a Transformer to determine which words in a sentence are most relevant when interpreting the meaning of a particular token.</p>
+<hr />
+<h2 id="key-takeaways">Key Takeaways<a class="headerlink" href="#key-takeaways" title="Permanent link">&para;</a></h2>
+<p>At the conclusion of the scaled dot-product attention computation,</p>
+<ul>
+<li>every token has compared itself with every other token,</li>
+<li>semantic relevance has been quantified numerically,</li>
+<li>attention probabilities have been computed,</li>
+<li>contextual information has been aggregated,</li>
+<li>and a new representation has been produced that encodes both the meaning of the token and the context in which it appears.</li>
+</ul>
+<p>This contextual representation is subsequently passed to the remaining layers of the Transformer, where progressively richer linguistic features are learned.
+Understanding why these models eventually gave way to Transformers provides valuable insight into the architectural decisions that underpin modern LLMs.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
