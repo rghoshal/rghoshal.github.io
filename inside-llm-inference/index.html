@@ -44,6 +44,8 @@
       
     
     
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -201,7 +203,7 @@
   <span class="md-ellipsis">
     
   
-    Home
+    AI Engineering Handbook
   
 
     
@@ -216,55 +218,6 @@
     
       
       
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    LLM Fundamentals
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    LLM Fundamentals
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
   
   
     
@@ -387,14 +340,6 @@
     </ul>
   
 </nav>
-      
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
       
     </li>
   
@@ -678,14 +623,14 @@
 <p>Rather than processing every pixel independently, CNNs apply small learnable filters across an image. These filters detect meaningful patterns such as edges, textures, corners, and shapes.</p>
 <p>The mathematical operation that drives a CNN is <strong>convolution</strong>.</p>
 <p>The convolution operation can be represented as</p>
-<p>$$
+<div class="arithmatex">\[
 S(i,j)
 =
 (I*K)(i,j)
 =
 \sum_{m}\sum_{n}
 I(i-m,j-n)K(m,n)
-$$</p>
+\]</div>
 <p>where</p>
 <table>
 <thead>
@@ -696,19 +641,19 @@ $$</p>
 </thead>
 <tbody>
 <tr>
-<td>$$I$$</td>
+<td><span class="arithmatex">\(I\)</span></td>
 <td>Input image</td>
 </tr>
 <tr>
-<td>$$K$$</td>
+<td><span class="arithmatex">\(K\)</span></td>
 <td>Convolution kernel (filter)</td>
 </tr>
 <tr>
-<td>$$S$$</td>
+<td><span class="arithmatex">\(S\)</span></td>
 <td>Output feature map</td>
 </tr>
 <tr>
-<td>$$M \times N$$</td>
+<td><span class="arithmatex">\(M \times N\)</span>$</td>
 <td>Kernel dimensions</td>
 </tr>
 </tbody>
@@ -1086,17 +1031,17 @@ jumps     over      the      lazy      dog
 <h2 id="computing-query-key-and-value">Computing Query, Key, and Value<a class="headerlink" href="#computing-query-key-and-value" title="Permanent link">&para;</a></h2>
 <p>Every input token first passes through the embedding layer.</p>
 <p>The resulting embedding matrix is denoted by</p>
-<p>$$
+<div class="arithmatex">\[
 X
-$$</p>
+\]</div>
 <p>Rather than using the embedding directly, the Transformer projects this embedding into three different vector spaces.</p>
 <p>These projections are computed using three independent learnable weight matrices.</p>
 <p>The mathematical formulation is</p>
-<p>$$
+<div class="arithmatex">\[
 Q=XW_Q,\qquad
 K=XW_K,\qquad
 V=XW_V
-$$</p>
+\]</div>
 <p>where</p>
 <table>
 <thead>
@@ -1107,31 +1052,31 @@ $$</p>
 </thead>
 <tbody>
 <tr>
-<td>$$X \in \mathbb{R}^{n \times d_{model}}$$</td>
+<td>$<span class="arithmatex">\(X \in \mathbb{R}^{n \times d_{model}}\)</span>$</td>
 <td>Input embedding matrix</td>
 </tr>
 <tr>
-<td>$$W_Q \in \mathbb{R}^{d_{model}\times d_k}$$</td>
+<td>$<span class="arithmatex">\(W_Q \in \mathbb{R}^{d_{model}\times d_k}\)</span>$</td>
 <td>Learnable query projection matrix</td>
 </tr>
 <tr>
-<td>$$W_K \in \mathbb{R}^{d_{model}\times d_k}$$</td>
+<td>$<span class="arithmatex">\(W_K \in \mathbb{R}^{d_{model}\times d_k}\)</span>$</td>
 <td>Learnable key projection matrix</td>
 </tr>
 <tr>
-<td>$$W_V \in \mathbb{R}^{d_{model}\times d_v}$$</td>
+<td>$<span class="arithmatex">\(W_V \in \mathbb{R}^{d_{model}\times d_v}\)</span>$</td>
 <td>Learnable value projection matrix</td>
 </tr>
 <tr>
-<td>$$Q$$</td>
+<td>$<span class="arithmatex">\(Q\)</span>$</td>
 <td>Query matrix</td>
 </tr>
 <tr>
-<td>$$K$$</td>
+<td>$<span class="arithmatex">\(K\)</span>$</td>
 <td>Key matrix</td>
 </tr>
 <tr>
-<td>$$V$$</td>
+<td>$<span class="arithmatex">\(V\)</span>$</td>
 <td>Value matrix</td>
 </tr>
 </tbody>
@@ -1160,9 +1105,9 @@ $$</p>
 <h2 id="step-1-compute-similarity-scores">Step 1 — Compute Similarity Scores<a class="headerlink" href="#step-1-compute-similarity-scores" title="Permanent link">&para;</a></h2>
 <p>The first step is to measure the similarity between every <strong>Query</strong> vector and every <strong>Key</strong> vector.</p>
 <p>Mathematically, this is achieved by multiplying the Query matrix with the transpose of the Key matrix.</p>
-<p>$$
+<div class="arithmatex">\[
 QK^{T}
-$$</p>
+\]</div>
 <p>The result is known as the <strong>attention score matrix</strong>.</p>
 <p>Each element of this matrix represents the similarity between one query vector and one key vector.</p>
 <p>For example,</p>
@@ -1198,25 +1143,25 @@ $$</p>
 <h3 id="why-a-dot-product">Why a Dot Product?<a class="headerlink" href="#why-a-dot-product" title="Permanent link">&para;</a></h3>
 <p>The dot product provides an efficient mathematical measure of similarity between two vectors.</p>
 <p>Given two vectors</p>
-<p>$$
+<div class="arithmatex">\[
 \mathbf{a}
 \quad\text{and}\quad
 \mathbf{b}
-$$</p>
+\]</div>
 <p>their dot product is</p>
-<p>$$
+<div class="arithmatex">\[
 \mathbf{a}\cdot\mathbf{b}
 =
 \sum_{i=1}^{d}
 a_i b_i
-$$</p>
+\]</div>
 <p>If the vectors point in similar directions, the dot product becomes large.</p>
 <p>If the vectors are unrelated, the dot product becomes smaller.</p>
 <p>If they point in opposite directions, the dot product may even become negative.</p>
 <p>Consequently, the matrix</p>
-<p>$$
+<div class="arithmatex">\[
 QK^T
-$$</p>
+\]</div>
 <p>contains a numerical estimate of how strongly every token should interact with every other token.</p>
 <hr />
 <h2 id="step-2-scale-the-attention-scores">Step 2 — Scale the Attention Scores<a class="headerlink" href="#step-2-scale-the-attention-scores" title="Permanent link">&para;</a></h2>
@@ -1225,23 +1170,23 @@ $$</p>
 <p>Large numerical values cause the softmax function to become excessively peaked, assigning almost all probability mass to a single token while suppressing the contributions of the remaining tokens.</p>
 <p>This makes optimization unstable and slows learning.</p>
 <p>To mitigate this effect, the Transformer scales the attention scores by the square root of the key dimension.</p>
-<p>$$
+<div class="arithmatex">\[
 \frac{QK^T}{\sqrt{d_k}}
-$$</p>
+\]</div>
 <p>where</p>
-<p>$$
+<div class="arithmatex">\[
 d_k
-$$</p>
+\]</div>
 <p>denotes the dimensionality of the key vectors.</p>
 <hr />
-<h3 id="why-divide-by-sqrtd_k">Why Divide by $$\sqrt{d_k}$$?<a class="headerlink" href="#why-divide-by-sqrtd_k" title="Permanent link">&para;</a></h3>
+<h3 id="why-divide-by-sqrtd_k">Why Divide by $<span class="arithmatex">\(\sqrt{d_k}\)</span>$?<a class="headerlink" href="#why-divide-by-sqrtd_k" title="Permanent link">&para;</a></h3>
 <p>Suppose</p>
 <pre><code>d_k = 64
 </code></pre>
 <p>Then</p>
-<p>$$
+<div class="arithmatex">\[
 \sqrt{d_k}=8
-$$</p>
+\]</div>
 <p>Every attention score is divided by</p>
 <pre><code>8
 </code></pre>
@@ -1258,21 +1203,21 @@ $$</p>
 <p>The scaled attention scores are still arbitrary numerical values.</p>
 <p>They must now be converted into probabilities.</p>
 <p>This transformation is performed by the <strong>softmax</strong> function.</p>
-<p>$$
+<div class="arithmatex">\[
 \operatorname{softmax}
 \left(
 \frac{QK^T}{\sqrt{d_k}}
 \right)
-$$</p>
+\]</div>
 <p>The softmax function transforms every row of the attention score matrix into a probability distribution.</p>
 <p>Every value now satisfies</p>
-<p>$$
+<div class="arithmatex">\[
 0 \le p_i \le 1
-$$</p>
+\]</div>
 <p>and</p>
-<p>$$
+<div class="arithmatex">\[
 \sum_i p_i = 1
-$$</p>
+\]</div>
 <p>Each row therefore answers the question</p>
 <blockquote>
 <p><strong>How much attention should this token pay to every other token?</strong></p>
@@ -1305,12 +1250,12 @@ $$</p>
 <h2 id="step-4-compute-the-final-contextual-representation">Step 4 — Compute the Final Contextual Representation<a class="headerlink" href="#step-4-compute-the-final-contextual-representation" title="Permanent link">&para;</a></h2>
 <p>The final step is to use these attention weights to combine the information stored in the <strong>Value</strong> matrix.</p>
 <p>This is accomplished by multiplying the attention probability matrix with the Value matrix.</p>
-<p>$$
+<div class="arithmatex">\[
 \operatorname{softmax}
 \left(
 \frac{QK^T}{\sqrt{d_k}}
 \right)V
-$$</p>
+\]</div>
 <p>Notice that the attention weights themselves do not contain semantic information.</p>
 <p>They merely determine <strong>how much</strong> of each value vector should be incorporated into the final output.</p>
 <p>The Value matrix supplies the actual information.</p>
@@ -1319,7 +1264,7 @@ $$</p>
 <hr />
 <h2 id="putting-everything-together">Putting Everything Together<a class="headerlink" href="#putting-everything-together" title="Permanent link">&para;</a></h2>
 <p>Combining all four computational stages yields the complete scaled dot-product attention equation.</p>
-<p>$$
+<div class="arithmatex">\[
 \operatorname{Attention}(Q,K,V)
 =
 \operatorname{softmax}
@@ -1328,7 +1273,7 @@ $$</p>
 {\sqrt{d_k}}
 \right)
 V
-$$</p>
+\]</div>
 <p>This elegant equation lies at the heart of every modern Transformer architecture.</p>
 <p>Although remarkably compact, it performs four sophisticated operations simultaneously.</p>
 <ol>
@@ -1411,6 +1356,12 @@ Understanding why these models eventually gave way to Transformers provides valu
     
     
       <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+      
+        <script src="../javascripts/math.js"></script>
       
     
   </body>
