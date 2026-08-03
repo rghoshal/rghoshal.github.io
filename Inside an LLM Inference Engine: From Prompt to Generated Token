@@ -1,0 +1,1033 @@
+# Inside an LLM Inference Engine
+### Chapter 1 — From User Prompt to Self-Attention
+
+---
+
+## Introduction
+
+Large Language Models (LLMs) have rapidly become one of the most influential technologies driving modern Artificial Intelligence. Whether the task involves answering questions, summarizing documents, writing software, generating images, or assisting autonomous agents, every interaction with an LLM begins with a common objective: understanding the user's intent and producing the most appropriate response.
+
+Although the generated output often appears instantaneous, the underlying inference engine performs a remarkably sophisticated series of mathematical transformations before a single token is produced.
+
+This article begins a deep technical journey into that inference pipeline.
+
+Rather than treating an LLM as a mysterious black box, we will gradually uncover the computational mechanisms that transform an input prompt into meaningful output. Along the way we will explore the mathematical foundations of Transformers, understand why the **Attention Is All You Need** architecture revolutionized Natural Language Processing, and examine how modern LLMs perform inference.
+
+---
+
+## Learning Objectives
+
+By the end of this article, you should understand:
+
+- How an LLM interprets a user prompt.
+- Why Transformers replaced earlier sequence models.
+- The limitations of CNNs, RNNs, LSTMs, and GRUs.
+- The motivation behind the Transformer architecture.
+- How the self-attention mechanism works.
+- How Query, Key, and Value vectors are computed.
+- How scaled dot-product attention is calculated.
+- Why multi-head attention is necessary.
+- How positional encoding preserves word order.
+
+---
+
+## Prerequisites
+
+The article assumes a basic understanding of:
+
+- Linear algebra
+- Matrix multiplication
+- Probability
+- Neural Networks
+- Basic Machine Learning concepts
+
+No prior knowledge of Transformers is required.
+
+---
+
+## Table of Contents
+
+1. Background
+2. Natural Language Understanding
+3. Evolution of Sequence Models
+   - Convolutional Neural Networks (CNN)
+   - Recurrent Neural Networks (RNN)
+   - Long Short-Term Memory (LSTM)
+   - Gated Recurrent Units (GRU)
+   - Bidirectional LSTM
+4. Transformers
+5. Self-Attention
+6. Multi-Head Attention
+7. Positional Encoding
+8. Summary
+9. References
+
+---
+
+# Background
+
+Large Language Models (LLMs) have become the computational foundation of modern Artificial Intelligence systems. They are increasingly integrated into software platforms to solve business problems ranging from conversational assistants and intelligent search to software development, autonomous agents, scientific research, and enterprise automation.
+
+The primary objective of an LLM is to generate the most appropriate output for a given input. Depending on the application, the input may take several forms.
+
+For example,
+
+> **Question Answering**
+
+Imagine asking an LLM:
+
+> *"Who invented electricity?"*
+
+The model analyzes the question, identifies the relevant concepts, retrieves contextual knowledge stored within its learned parameters, and generates a coherent response.
+
+---
+
+> **Task Execution**
+
+Consider an intelligent software agent instructed to:
+
+> *Find obsolete files and folders on a computer, remove temporary files, and generate a storage utilization report.*
+
+In this case, the LLM is no longer generating only text. Instead, it plans and orchestrates a sequence of actions using external tools to accomplish the objective.
+
+---
+
+> **Multi-Agent Collaboration**
+
+Imagine an autonomous driving system where multiple intelligent agents communicate continuously.
+
+One agent observes road conditions.
+
+Another predicts pedestrian movement.
+
+A third plans vehicle trajectory.
+
+Yet another controls steering and braking.
+
+Collectively, these agents coordinate their decisions to safely navigate the vehicle.
+
+Although the applications differ significantly, they all rely upon the same underlying capability:
+
+> **Understanding the meaning of an input before generating an appropriate output.**
+
+---
+
+## What Happens Internally?
+
+Regardless of whether the input is
+
+- a question,
+- a command,
+- a software task,
+- or a sequence of autonomous actions,
+
+an LLM performs inference.
+
+Inference is the computational process through which the model converts the input into internal numerical representations, reasons over those representations, and gradually predicts the next most probable output token.
+
+At its core, inference consists of a sequence of mathematical operations executed across multiple layers of a Transformer neural network.
+
+These computations involve:
+
+- tokenization,
+- embedding generation,
+- positional encoding,
+- self-attention,
+- feed-forward neural networks,
+- normalization,
+- probability estimation,
+- and autoregressive decoding.
+
+The objective of this article is to understand these computations from first principles.
+
+---
+
+> **Note**
+>
+> Throughout this article we will focus exclusively on **Natural Language Understanding (NLU)** using textual prompts.
+>
+> Extensions to multimodal systems—including images, audio, and video—will be discussed in later articles once the underlying Transformer architecture has been established.
+
+---
+
+# Natural Language Understanding (NLU)
+
+Natural Language Understanding (NLU) is the branch of Artificial Intelligence concerned with enabling machines to interpret and reason about human language.
+
+Within an LLM, every interaction begins with a prompt supplied by the user.
+
+A prompt may consist of:
+
+- a single word,
+- a sentence,
+- several paragraphs,
+- a programming task,
+- or an entire conversation.
+
+Although humans perceive a prompt as ordinary language, an LLM cannot process words directly.
+
+Instead, the prompt must undergo a sequence of mathematical transformations before meaningful computation can begin.
+
+At a high level, this transformation pipeline consists of the following stages:
+
+1. Receive the textual prompt.
+2. Tokenize the input.
+3. Convert tokens into numerical embeddings.
+4. Inject positional information.
+5. Compute contextual relationships using self-attention.
+6. Generate contextual representations.
+7. Predict the next token.
+8. Repeat until the response is complete.
+
+Every stage in this pipeline is implemented using matrix operations executed by the Transformer architecture.
+
+---
+
+## Why "Attention"?
+
+There is a reason this article repeatedly emphasizes the word **Attention**.
+
+In 2017, researchers at Google published one of the most influential papers in modern Deep Learning:
+
+> **Attention Is All You Need**
+
+This work fundamentally changed the way sequence modelling is performed.
+
+Rather than processing words one after another—as earlier neural networks had done—the Transformer architecture introduced a mechanism that allows every word in a sentence to interact directly with every other word simultaneously.
+
+This mechanism became known as **Self-Attention**.
+
+Modern LLMs—including GPT, Claude, Gemini, Llama, DeepSeek, and many others—are all built upon this fundamental principle.
+
+Before we study Transformers, however, it is useful to understand the sequence models that preceded them and the limitations that ultimately motivated the development of the Transformer architecture.
+
+---
+
+# Evolution of Sequence Models
+
+Before the introduction of Transformers, sequence modelling relied primarily on several families of neural networks.
+
+Each successive architecture attempted to overcome limitations present in its predecessors.
+
+The major evolutionary stages are:
+
+- Convolutional Neural Networks (CNN)
+- Recurrent Neural Networks (RNN)
+- Long Short-Term Memory (LSTM)
+- Gated Recurrent Units (GRU)
+- Bidirectional LSTM
+
+# Evolution of Sequence Models
+
+Before the introduction of Transformers, sequence modelling was dominated by several families of neural networks, each designed to overcome the shortcomings of its predecessors.
+
+Every architecture contributed an important advancement to the field of Deep Learning, yet each also introduced limitations that eventually motivated the development of the Transformer.
+
+The progression can be summarized as follows:
+
+```
+CNN → RNN → LSTM → GRU → Bidirectional LSTM → Transformer
+```
+
+Each model addressed a different aspect of learning from sequential data. Understanding these architectures helps us appreciate why the Transformer represented such a significant leap forward.
+
+---
+
+## Convolutional Neural Networks (CNN)
+
+Convolutional Neural Networks (CNNs) were originally developed for processing grid-like data such as images. Their remarkable ability to extract local spatial features made them the dominant architecture for computer vision tasks.
+
+Rather than processing every pixel independently, CNNs apply small learnable filters across an image. These filters detect meaningful patterns such as edges, textures, corners, and shapes.
+
+The mathematical operation that drives a CNN is **convolution**.
+
+The convolution operation can be represented as
+
+$$
+S(i,j)
+=
+(I*K)(i,j)
+=
+\sum_{m}\sum_{n}
+I(i-m,j-n)K(m,n)
+$$
+
+where
+
+| Symbol | Description |
+|---------|-------------|
+| $$I$$ | Input image |
+| $$K$$ | Convolution kernel (filter) |
+| $$S$$ | Output feature map |
+| $$M \times N$$ | Kernel dimensions |
+
+The convolution filter slides over the input image and performs localized dot products between the kernel and the corresponding image region.
+
+The resulting feature map highlights characteristics that are important for the task being performed.
+
+Typical examples include
+
+- edges
+- corners
+- textures
+- shapes
+- repetitive visual patterns
+
+CNNs have been extremely successful in
+
+- Image Classification
+- Object Detection
+- Face Recognition
+- Medical Imaging
+- Autonomous Driving
+
+### Advantages
+
+- Excellent at extracting local features.
+- Translation invariant.
+- Computationally efficient.
+- Highly parallelizable.
+
+### Limitations
+
+Despite their success in computer vision, CNNs are not naturally suited for modelling long-range dependencies in language.
+
+A convolution filter only observes a limited neighborhood of the input.
+
+Capturing relationships between words that are far apart in a sentence requires many convolutional layers, making language modelling inefficient.
+
+---
+
+## Recurrent Neural Networks (RNN)
+
+Unlike CNNs, Recurrent Neural Networks were specifically designed for sequential data.
+
+Instead of processing every input independently, an RNN maintains an internal hidden state that carries information from previous time steps.
+
+Conceptually,
+
+```
+Word1 → Word2 → Word3 → Word4 → ...
+```
+
+Each word depends upon the computations performed for all previous words.
+
+This enables the network to model temporal relationships.
+
+RNNs compute
+
+- current input
+- previous hidden state
+- updated hidden state
+
+at every time step.
+
+This makes them suitable for
+
+- Natural Language Processing
+- Speech Recognition
+- Time-Series Forecasting
+- Machine Translation
+
+### Common RNN Architectures
+
+RNNs are commonly categorized according to the relationship between their inputs and outputs.
+
+#### One-to-One
+
+One input produces one output.
+
+Example:
+
+- Image Classification
+
+---
+
+#### One-to-Many
+
+One input produces multiple outputs.
+
+Example:
+
+- Image Captioning
+
+---
+
+#### Many-to-One
+
+Multiple sequential inputs produce one output.
+
+Example:
+
+- Sentiment Analysis
+
+---
+
+#### Many-to-Many
+
+Multiple sequential inputs produce multiple sequential outputs.
+
+Example:
+
+- Language Translation
+
+---
+
+### Advantages
+
+- Captures sequential information.
+- Maintains contextual memory.
+- Naturally models temporal dependencies.
+
+### Limitations
+
+Because computation is inherently sequential,
+
+```
+Word 1
+ ↓
+Word 2
+ ↓
+Word 3
+ ↓
+Word 4
+```
+
+each word must wait until the previous word has been processed.
+
+This severely limits parallel execution on modern GPUs.
+
+Even more importantly, RNNs suffer from the **vanishing gradient** and **exploding gradient** problems.
+
+As sequences become longer, gradients either shrink towards zero or grow uncontrollably, preventing effective learning.
+
+This makes it difficult for an RNN to remember information occurring many time steps in the past.
+
+---
+
+## Long Short-Term Memory Networks (LSTM)
+
+Long Short-Term Memory (LSTM) networks were introduced to overcome the memory limitations of traditional RNNs.
+
+Rather than relying upon a single hidden state, an LSTM introduces a memory cell capable of selectively retaining or discarding information.
+
+The architecture contains three gating mechanisms.
+
+### Forget Gate
+
+Determines which information should be discarded.
+
+---
+
+### Input Gate
+
+Determines what new information should be stored.
+
+---
+
+### Output Gate
+
+Determines what information should be propagated to the next time step.
+
+---
+
+Together, these gates enable the network to preserve important contextual information across much longer sequences.
+
+LSTMs became the dominant architecture for sequence modelling before the arrival of Transformers.
+
+Applications include
+
+- Language Modelling
+- Speech Recognition
+- Machine Translation
+- Time-Series Forecasting
+- Healthcare Analytics
+
+### Advantages
+
+- Learns long-term dependencies.
+- Significantly reduces the vanishing gradient problem.
+- Robust across many sequential learning tasks.
+
+### Limitations
+
+LSTMs still process data sequentially.
+
+Although memory is improved, computation remains difficult to parallelize.
+
+Training therefore becomes increasingly expensive as sequence length grows.
+
+---
+
+## Gated Recurrent Units (GRU)
+
+Gated Recurrent Units simplify the LSTM architecture while retaining much of its performance.
+
+Instead of three gates, a GRU employs only two.
+
+### Update Gate
+
+Controls how much past information should be retained.
+
+---
+
+### Reset Gate
+
+Controls how much historical information should be ignored when computing the new hidden state.
+
+---
+
+Because GRUs contain fewer parameters,
+
+- fewer matrix multiplications
+- lower memory usage
+- faster training
+- faster inference
+
+they are often preferred in applications where computational efficiency is important.
+
+### Advantages
+
+- Simpler than LSTMs.
+- Faster training.
+- Lower computational complexity.
+- Comparable performance in many NLP tasks.
+
+### Limitations
+
+Although computationally cheaper, GRUs remain fundamentally sequential and therefore cannot exploit the massive parallelism available on modern GPU architectures.
+
+---
+
+## Bidirectional LSTM
+
+A Bidirectional LSTM extends the standard LSTM by processing a sequence in both directions simultaneously.
+
+```
+Forward Pass
+Word1 → Word2 → Word3 → Word4
+
+Backward Pass
+Word1 ← Word2 ← Word3 ← Word4
+```
+
+The final representation combines information from both directions.
+
+This enables every word to incorporate context from
+
+- preceding words
+- succeeding words
+
+Applications include
+
+- Named Entity Recognition (NER)
+- Part-of-Speech Tagging
+- Question Answering
+- Machine Translation
+
+Although Bidirectional LSTMs significantly improve contextual understanding, they still inherit the fundamental limitations of recurrent computation.
+
+Every token depends upon computations performed at previous time steps, preventing efficient parallel execution.
+
+---
+
+## Why a New Architecture Was Needed
+
+By the mid-2010s, researchers had reached several important conclusions.
+
+Although RNNs, LSTMs, GRUs, and Bidirectional LSTMs achieved impressive results, they all shared a common bottleneck.
+
+They processed sequences **one token at a time**.
+
+This imposed three major limitations.
+
+1. Limited parallelism.
+
+2. Difficulty learning long-range dependencies.
+
+3. Increasing computational cost as sequence length grew.
+
+Modern GPUs are designed to execute thousands of independent operations simultaneously.
+
+Sequential neural networks were fundamentally incompatible with this hardware model.
+
+Researchers therefore began searching for an architecture capable of processing **every token in a sentence simultaneously** while still preserving contextual understanding.
+
+That search culminated in one of the most influential papers in Artificial Intelligence:
+
+> **Attention Is All You Need**
+
+The architecture introduced in that paper became known as the **Transformer**, and it forms the computational foundation of virtually every modern Large Language Model.
+
+In the next section, we will examine how the Transformer fundamentally redefined sequence modelling through the introduction of the **self-attention mechanism**.
+
+# Transformers
+
+The publication of the paper **"Attention Is All You Need"** by Vaswani *et al.* in 2017 marked one of the most significant milestones in the history of Artificial Intelligence. It introduced an entirely new neural network architecture—the **Transformer**—that fundamentally changed the way machines process sequential information.
+
+Unlike earlier sequence models, Transformers abandoned recurrent computation altogether. Instead of processing one token after another, the Transformer processes **every token in the input sequence simultaneously**, allowing modern hardware such as GPUs and TPUs to exploit massive parallelism during both training and inference.
+
+This architectural shift dramatically reduced training time while simultaneously improving the model's ability to capture long-range dependencies between words.
+
+Today, nearly every modern Large Language Model—including GPT, Claude, Gemini, Llama, DeepSeek, Mistral, and Qwen—is built upon the Transformer architecture.
+
+---
+
+## Why Transformers?
+
+To appreciate why the Transformer represented such a revolutionary step, let us revisit the primary limitation shared by all previous sequence models.
+
+Consider the sentence
+
+> *The quick brown fox jumps over the lazy dog.*
+
+An RNN processes this sentence as
+
+```
+The
+ ↓
+quick
+ ↓
+brown
+ ↓
+fox
+ ↓
+jumps
+ ↓
+over
+ ↓
+the
+ ↓
+lazy
+ ↓
+dog
+```
+
+Each word must wait until the previous word has been processed.
+
+Consequently,
+
+- computation cannot be parallelized,
+- long-term dependencies become increasingly difficult to learn,
+- training time grows with sequence length.
+
+The Transformer eliminates this sequential dependency.
+
+Instead, every token is processed simultaneously.
+
+```
+The      quick      brown      fox
+   \        |         |        /
+      Every token attends to every other token
+   /        |         |        \
+jumps     over      the      lazy      dog
+```
+
+This ability to model relationships between all words at once forms the foundation of the **self-attention mechanism**.
+
+---
+
+## High-Level Transformer Architecture
+
+At a conceptual level, the original Transformer consists of two major components.
+
+```
+                Input Sentence
+                      │
+                      ▼
+             Input Embeddings
+                      │
+                      ▼
+           Positional Encoding
+                      │
+                      ▼
+          ┌─────────────────────┐
+          │     Encoder Stack   │
+          └─────────────────────┘
+                      │
+              Contextual Memory
+                      │
+                      ▼
+          ┌─────────────────────┐
+          │     Decoder Stack   │
+          └─────────────────────┘
+                      │
+                      ▼
+              Predicted Output
+```
+
+The encoder converts the input sequence into a rich contextual representation.
+
+The decoder uses this representation to generate the output sequence one token at a time.
+
+Although the original Transformer consists of both encoders and decoders, modern LLMs adopt different variants depending upon their intended purpose.
+
+For example,
+
+| Model | Architecture |
+|--------|--------------|
+| BERT | Encoder Only |
+| GPT | Decoder Only |
+| T5 | Encoder–Decoder |
+| BART | Encoder–Decoder |
+| Claude | Decoder Only |
+| Gemini | Decoder Only |
+| Llama | Decoder Only |
+
+Despite these architectural variations, they all rely upon one common computational primitive:
+
+> **Self-Attention**
+
+---
+
+# Self-Attention
+
+Self-attention is the computational mechanism that allows every token in a sequence to determine how strongly it should relate to every other token.
+
+Rather than considering only neighboring words, each token can directly examine the entire input sequence.
+
+Consider the sentence
+
+> *The animal didn't cross the street because **it** was tired.*
+
+To correctly interpret the word **it**, the model must determine whether **it** refers to
+
+- the animal, or
+- the street.
+
+Humans solve this effortlessly because we understand context.
+
+Transformers solve the same problem mathematically using self-attention.
+
+Each word computes a numerical relationship with every other word in the sentence.
+
+These relationships become known as **attention scores**.
+
+Words receiving larger attention scores contribute more strongly to the final representation of the current token.
+
+---
+
+## The Query–Key–Value (QKV) Mechanism
+
+The self-attention mechanism is built around three mathematical representations for every token.
+
+- Query (Q)
+- Key (K)
+- Value (V)
+
+The terminology originates from information retrieval systems.
+
+Imagine searching for a book in a library.
+
+- The **Query** represents what you are searching for.
+- The **Key** describes the characteristics of every available book.
+- The **Value** contains the actual contents of the selected book.
+
+The retrieval system compares your query against every key.
+
+The closest matching keys identify which values should be retrieved.
+
+Transformers perform exactly the same operation, except that the comparison is carried out using matrix multiplication instead of database lookups.
+
+---
+
+## Computing Query, Key, and Value
+
+Every input token first passes through the embedding layer.
+
+The resulting embedding matrix is denoted by
+
+$$
+X
+$$
+
+Rather than using the embedding directly, the Transformer projects this embedding into three different vector spaces.
+
+These projections are computed using three independent learnable weight matrices.
+
+The mathematical formulation is
+
+$$
+Q=XW_Q,\qquad
+K=XW_K,\qquad
+V=XW_V
+$$
+
+where
+
+| Symbol | Description |
+|---------|-------------|
+| $$X \in \mathbb{R}^{n \times d_{model}}$$ | Input embedding matrix |
+| $$W_Q \in \mathbb{R}^{d_{model}\times d_k}$$ | Learnable query projection matrix |
+| $$W_K \in \mathbb{R}^{d_{model}\times d_k}$$ | Learnable key projection matrix |
+| $$W_V \in \mathbb{R}^{d_{model}\times d_v}$$ | Learnable value projection matrix |
+| $$Q$$ | Query matrix |
+| $$K$$ | Key matrix |
+| $$V$$ | Value matrix |
+
+Notice that every token produces **three different vector representations**.
+
+These vectors encode different aspects of the same token.
+
+The Query asks:
+
+> *What information am I looking for?*
+
+The Key answers:
+
+> *What information do I contain?*
+
+The Value represents:
+
+> *What information should I contribute if selected?*
+
+The next step is to compare every Query against every Key.
+
+This comparison produces the raw attention scores that determine how strongly tokens should influence one another.
+
+# Computing Scaled Dot-Product Attention
+
+The Query, Key, and Value matrices by themselves do not establish any relationship between the tokens in a sentence. They merely represent three different learned projections of the input embeddings.
+
+The next objective is to determine **how strongly each token should attend to every other token** in the sequence.
+
+This process is performed in four distinct computational stages.
+
+---
+
+## Step 1 — Compute Similarity Scores
+
+The first step is to measure the similarity between every **Query** vector and every **Key** vector.
+
+Mathematically, this is achieved by multiplying the Query matrix with the transpose of the Key matrix.
+
+$$
+QK^{T}
+$$
+
+The result is known as the **attention score matrix**.
+
+Each element of this matrix represents the similarity between one query vector and one key vector.
+
+For example,
+
+| Query Token | Key Token | Attention Score |
+|-------------|-----------|----------------:|
+| "The" | "animal" | 0.73 |
+| "The" | "street" | 0.11 |
+| "The" | "tired" | 0.08 |
+
+Higher values indicate greater semantic relevance.
+
+Lower values indicate weaker relationships.
+
+---
+
+### Why a Dot Product?
+
+The dot product provides an efficient mathematical measure of similarity between two vectors.
+
+Given two vectors
+
+$$
+\mathbf{a}
+\quad\text{and}\quad
+\mathbf{b}
+$$
+
+their dot product is
+
+$$
+\mathbf{a}\cdot\mathbf{b}
+=
+\sum_{i=1}^{d}
+a_i b_i
+$$
+
+If the vectors point in similar directions, the dot product becomes large.
+
+If the vectors are unrelated, the dot product becomes smaller.
+
+If they point in opposite directions, the dot product may even become negative.
+
+Consequently, the matrix
+
+$$
+QK^T
+$$
+
+contains a numerical estimate of how strongly every token should interact with every other token.
+
+---
+
+## Step 2 — Scale the Attention Scores
+
+Although the dot product provides an excellent similarity measure, it introduces an important numerical problem.
+
+As the dimensionality of the vectors increases, the magnitude of the dot products also increases.
+
+Large numerical values cause the softmax function to become excessively peaked, assigning almost all probability mass to a single token while suppressing the contributions of the remaining tokens.
+
+This makes optimization unstable and slows learning.
+
+To mitigate this effect, the Transformer scales the attention scores by the square root of the key dimension.
+
+$$
+\frac{QK^T}{\sqrt{d_k}}
+$$
+
+where
+
+$$
+d_k
+$$
+
+denotes the dimensionality of the key vectors.
+
+---
+
+### Why Divide by $$\sqrt{d_k}$$?
+
+Suppose
+
+```
+d_k = 64
+```
+
+Then
+
+$$
+\sqrt{d_k}=8
+$$
+
+Every attention score is divided by
+
+```
+8
+```
+
+before applying the softmax function.
+
+This normalization prevents the exponential function inside softmax from becoming numerically unstable.
+
+As a result,
+
+- gradients remain well behaved,
+- training becomes more stable,
+- convergence becomes faster.
+
+---
+
+## Step 3 — Convert Scores into Probabilities
+
+The scaled attention scores are still arbitrary numerical values.
+
+They must now be converted into probabilities.
+
+This transformation is performed by the **softmax** function.
+
+$$
+\operatorname{softmax}
+\left(
+\frac{QK^T}{\sqrt{d_k}}
+\right)
+$$
+
+The softmax function transforms every row of the attention score matrix into a probability distribution.
+
+Every value now satisfies
+
+$$
+0 \le p_i \le 1
+$$
+
+and
+
+$$
+\sum_i p_i = 1
+$$
+
+Each row therefore answers the question
+
+> **How much attention should this token pay to every other token?**
+
+For example,
+
+| Token | Attention Weight |
+|--------|-----------------:|
+| animal | 0.72 |
+| street | 0.08 |
+| tired | 0.20 |
+
+The token **animal** receives the highest attention weight and therefore contributes most strongly to the contextual representation.
+
+---
+
+## Step 4 — Compute the Final Contextual Representation
+
+The final step is to use these attention weights to combine the information stored in the **Value** matrix.
+
+This is accomplished by multiplying the attention probability matrix with the Value matrix.
+
+$$
+\operatorname{softmax}
+\left(
+\frac{QK^T}{\sqrt{d_k}}
+\right)V
+$$
+
+Notice that the attention weights themselves do not contain semantic information.
+
+They merely determine **how much** of each value vector should be incorporated into the final output.
+
+The Value matrix supplies the actual information.
+
+Consequently,
+
+tokens receiving larger attention weights contribute more strongly to the resulting contextual representation.
+
+---
+
+## Putting Everything Together
+
+Combining all four computational stages yields the complete scaled dot-product attention equation.
+
+$$
+\operatorname{Attention}(Q,K,V)
+=
+\operatorname{softmax}
+\left(
+\frac{QK^T}
+{\sqrt{d_k}}
+\right)
+V
+$$
+
+This elegant equation lies at the heart of every modern Transformer architecture.
+
+Although remarkably compact, it performs four sophisticated operations simultaneously.
+
+1. Computes semantic similarity between every pair of tokens.
+
+2. Normalizes those similarities to maintain numerical stability.
+
+3. Converts the similarities into probability distributions.
+
+4. Produces contextualized token representations by computing weighted combinations of the Value vectors.
+
+It is this mechanism that enables a Transformer to determine which words in a sentence are most relevant when interpreting the meaning of a particular token.
+
+---
+
+## Key Takeaways
+
+At the conclusion of the scaled dot-product attention computation,
+
+- every token has compared itself with every other token,
+- semantic relevance has been quantified numerically,
+- attention probabilities have been computed,
+- contextual information has been aggregated,
+- and a new representation has been produced that encodes both the meaning of the token and the context in which it appears.
+
+This contextual representation is subsequently passed to the remaining layers of the Transformer, where progressively richer linguistic features are learned.
+Understanding why these models eventually gave way to Transformers provides valuable insight into the architectural decisions that underpin modern LLMs.
