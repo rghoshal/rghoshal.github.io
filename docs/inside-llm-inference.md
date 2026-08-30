@@ -110,6 +110,12 @@ Although the applications differ significantly, they all rely upon the same unde
 
 > **Understanding the meaning of an input before generating an appropriate output.**
 
+Imagine providing an LLM to comprehend a mathematics problem by feeding it with the actual problem statement of the problem - ' Devise an
+algorithm to find all possible prime numbers between any 2 integers in
+the set of positive integers '.
+
+The LLM comes up with a method to arrive at the response to the problem.
+
 ---
 
 ## What Happens Internally?
