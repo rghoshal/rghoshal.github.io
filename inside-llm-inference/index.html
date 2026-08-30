@@ -1052,31 +1052,31 @@ V=XW_V
 </thead>
 <tbody>
 <tr>
-<td>$<span class="arithmatex">\(X \in \mathbb{R}^{n \times d_{model}}\)</span>$</td>
+<td><span class="arithmatex">\(X \in \mathbb{R}^{n \times d_{model}}\)</span></td>
 <td>Input embedding matrix</td>
 </tr>
 <tr>
-<td>$<span class="arithmatex">\(W_Q \in \mathbb{R}^{d_{model}\times d_k}\)</span>$</td>
+<td><span class="arithmatex">\(W_Q \in \mathbb{R}^{d_{model}\times d_k}\)</span></td>
 <td>Learnable query projection matrix</td>
 </tr>
 <tr>
-<td>$<span class="arithmatex">\(W_K \in \mathbb{R}^{d_{model}\times d_k}\)</span>$</td>
+<td><span class="arithmatex">\(W_K \in \mathbb{R}^{d_{model}\times d_k}\)</span></td>
 <td>Learnable key projection matrix</td>
 </tr>
 <tr>
-<td>$<span class="arithmatex">\(W_V \in \mathbb{R}^{d_{model}\times d_v}\)</span>$</td>
+<td><span class="arithmatex">\(W_V \in \mathbb{R}^{d_{model}\times d_v}\)</span></td>
 <td>Learnable value projection matrix</td>
 </tr>
 <tr>
-<td>$<span class="arithmatex">\(Q\)</span>$</td>
+<td><span class="arithmatex">\(Q\)</span></td>
 <td>Query matrix</td>
 </tr>
 <tr>
-<td>$<span class="arithmatex">\(K\)</span>$</td>
+<td><span class="arithmatex">\(K\)</span></td>
 <td>Key matrix</td>
 </tr>
 <tr>
-<td>$<span class="arithmatex">\(V\)</span>$</td>
+<td><span class="arithmatex">\(V\)</span></td>
 <td>Value matrix</td>
 </tr>
 </tbody>
@@ -1303,6 +1303,11 @@ V
 </ul>
 <p>This contextual representation is subsequently passed to the remaining layers of the Transformer, where progressively richer linguistic features are learned.
 Understanding why these models eventually gave way to Transformers provides valuable insight into the architectural decisions that underpin modern LLMs.</p>
+<h2 id="the-actual-journey">The actual journey<a class="headerlink" href="#the-actual-journey" title="Permanent link">&para;</a></h2>
+<p>As a summary , Once the input text enters the Transformer, it is first tokenized into a sequence of discrete token identifiers. Each token identifier is then mapped to a dense vector representation through a lookup in the model's learned embedding matrix. Positional information is added to these embeddings so that the model can distinguish the relative positions of the tokens within the sequence.</p>
+<p>Each embedding is subsequently projected into three different vector spaces, producing the Query (Q), Key (K), and Value (V) representations. Rather than computing a single attention score for a token, the Transformer compares the Query vector of every token with the Key vectors of all tokens in the input sequence. These pairwise comparisons produce an attention score matrix that quantifies the semantic relevance between every pair of tokens.</p>
+<p>The attention scores are scaled and normalized using the softmax function, producing a probability distribution that determines how strongly each token should attend to every other token. These attention weights are then used to compute weighted combinations of the Value vectors, generating new contextual representations that incorporate information from the entire sequence.</p>
+<p>This computation is performed simultaneously for every token in the input, allowing the Transformer to process the entire sequence in parallel. After passing through multiple Transformer layers, the final contextual representation of the current decoding position is projected onto the model's vocabulary, where a final softmax operation produces a probability distribution over all possible next tokens. The token with the highest probability—or one selected according to a decoding strategy such as greedy search, beam search, or sampling—is then generated as the model's next output.</p>
 
 
 
