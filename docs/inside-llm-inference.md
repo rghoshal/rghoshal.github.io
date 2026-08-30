@@ -1,4 +1,4 @@
-# Inside an LLM Inference Engine From Prompt to Generated Token
+# Inside an LLM Inference Engine
 ### Chapter 1 — From User Prompt to Self-Attention
 
 ---
@@ -88,7 +88,7 @@ Consider an intelligent software agent instructed to:
 
 > *Find obsolete files and folders on a computer, remove temporary files, and generate a storage utilization report.*
 
-In this case, the LLM is no longer generating only text. Instead, it is planning and orchestrating a sequence of actions using external tools to accomplish the objective which is , in this case , a set of discrete tasks.
+In this case, the LLM is no longer generating only text. Instead, it plans and orchestrates a sequence of actions using external tools to accomplish the objective.
 
 ---
 
@@ -110,11 +110,6 @@ Although the applications differ significantly, they all rely upon the same unde
 
 > **Understanding the meaning of an input before generating an appropriate output.**
 
-Imagine providing an LLM to comprehend a mathematics problem by feeding it with the actual problem statement of the problem - ' Devise an
-algorithm to find all possible prime numbers between any 2 integers in
-the set of positive integers '.
-
-The LLM comes up with a method to arrive at the response to the problem.
 ---
 
 ## What Happens Internally?
@@ -124,10 +119,9 @@ Regardless of whether the input is
 - a question,
 - a command,
 - a software task,
-- a sequence of autonomous actions
-- a process
+- or a sequence of autonomous actions,
 
-an LLM uses a common derivative action called "inference" by which it .
+an LLM performs inference.
 
 Inference is the computational process through which the model converts the input into internal numerical representations, reasons over those representations, and gradually predicts the next most probable output token.
 
@@ -262,10 +256,10 @@ where
 
 | Symbol | Description |
 |---------|-------------|
-| $$I$$ | Input image |
-| $$K$$ | Convolution kernel (filter) |
-| $$S$$ | Output feature map |
-| $$M \times N$$ | Kernel dimensions |
+| $I$ | Input image |
+| $K$ | Convolution kernel (filter) |
+| $S$ | Output feature map |
+| $M \times N$$ | Kernel dimensions |
 
 The convolution filter slides over the input image and performs localized dot products between the kernel and the corresponding image region.
 
@@ -763,13 +757,13 @@ where
 
 | Symbol | Description |
 |---------|-------------|
-| $$X \in \mathbb{R}^{n \times d_{model}}$$ | Input embedding matrix |
-| $$W_Q \in \mathbb{R}^{d_{model}\times d_k}$$ | Learnable query projection matrix |
-| $$W_K \in \mathbb{R}^{d_{model}\times d_k}$$ | Learnable key projection matrix |
-| $$W_V \in \mathbb{R}^{d_{model}\times d_v}$$ | Learnable value projection matrix |
-| $$Q$$ | Query matrix |
-| $$K$$ | Key matrix |
-| $$V$$ | Value matrix |
+| $X \in \mathbb{R}^{n \times d_{model}}$ | Input embedding matrix |
+| $W_Q \in \mathbb{R}^{d_{model}\times d_k}$ | Learnable query projection matrix |
+| $W_K \in \mathbb{R}^{d_{model}\times d_k}$ | Learnable key projection matrix |
+| $W_V \in \mathbb{R}^{d_{model}\times d_v}$ | Learnable value projection matrix |
+| $Q$ | Query matrix |
+| $K$ | Key matrix |
+| $V$ | Value matrix |
 
 Notice that every token produces **three different vector representations**.
 
@@ -1037,3 +1031,12 @@ At the conclusion of the scaled dot-product attention computation,
 
 This contextual representation is subsequently passed to the remaining layers of the Transformer, where progressively richer linguistic features are learned.
 Understanding why these models eventually gave way to Transformers provides valuable insight into the architectural decisions that underpin modern LLMs.
+
+## The actual journey
+As a summary , Once the input text enters the Transformer, it is first tokenized into a sequence of discrete token identifiers. Each token identifier is then mapped to a dense vector representation through a lookup in the model's learned embedding matrix. Positional information is added to these embeddings so that the model can distinguish the relative positions of the tokens within the sequence.
+
+Each embedding is subsequently projected into three different vector spaces, producing the Query (Q), Key (K), and Value (V) representations. Rather than computing a single attention score for a token, the Transformer compares the Query vector of every token with the Key vectors of all tokens in the input sequence. These pairwise comparisons produce an attention score matrix that quantifies the semantic relevance between every pair of tokens.
+
+The attention scores are scaled and normalized using the softmax function, producing a probability distribution that determines how strongly each token should attend to every other token. These attention weights are then used to compute weighted combinations of the Value vectors, generating new contextual representations that incorporate information from the entire sequence.
+
+This computation is performed simultaneously for every token in the input, allowing the Transformer to process the entire sequence in parallel. After passing through multiple Transformer layers, the final contextual representation of the current decoding position is projected onto the model's vocabulary, where a final softmax operation produces a probability distribution over all possible next tokens. The token with the highest probability—or one selected according to a decoding strategy such as greedy search, beam search, or sampling—is then generated as the model's next output.
