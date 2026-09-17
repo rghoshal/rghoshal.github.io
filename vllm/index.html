@@ -21,7 +21,7 @@
     
     
       
-        <title>vLLM: High-Throughput, Memory-Efficient LLM Serving — Technical, Architectural, Commercial, and Product Analysis - AI Engineering Handbook</title>
+        <title>How vLLM Works Internally - AI Engineering Handbook</title>
       
     
     
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#vllm-high-throughput-memory-efficient-llm-serving-technical-architectural-commercial-and-product-analysis" class="md-skip">
+        <a href="#how-vllm-works-internally" class="md-skip">
           Skip to content
         </a>
       
@@ -100,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              vLLM: High-Throughput, Memory-Efficient LLM Serving — Technical, Architectural, Commercial, and Product Analysis
+              How vLLM Works Internally
             
           </span>
         </div>
@@ -230,7 +230,7 @@
   <span class="md-ellipsis">
     
   
-    Introduction
+    Agentic AI: How AI Agents Use Tools to Solve Problems
   
 
     
@@ -257,7 +257,7 @@
   <span class="md-ellipsis">
     
   
-    Introduction
+    Continuous Batching: The Secret Behind High-Throughput LLM Serving
   
 
     
@@ -284,7 +284,7 @@
   <span class="md-ellipsis">
     
   
-    Standard Engineering Blueprint: Designing and Implementing a Production-Grade Enterprise LLM Serving Platform
+    Designing a Production-Grade LLM Serving Platform
   
 
     
@@ -311,7 +311,7 @@
   <span class="md-ellipsis">
     
   
-    Introduction
+    FlashAttention Explained Without the Math
   
 
     
@@ -338,7 +338,7 @@
   <span class="md-ellipsis">
     
   
-    The Future of LLM Inference: From Hardware-Software Co-Design to Evolutionary Industrial Intelligence
+    The Future of LLM Inference: Speculative Decoding, MoE, and Disaggregated Serving
   
 
     
@@ -365,7 +365,7 @@
   <span class="md-ellipsis">
     
   
-    Inside an LLM Inference Engine
+    Inside an LLM Inference Engine: From Prompt to Generated Token
   
 
     
@@ -392,7 +392,7 @@
   <span class="md-ellipsis">
     
   
-    The Mechanics, Mathematics, and Hardware Architecture of Key-Value (KV) Caching in Large Language Models
+    KV Cache: The Innovation That Made Modern LLMs Practical
   
 
     
@@ -419,7 +419,7 @@
   <span class="md-ellipsis">
     
   
-    The Mathematics, Algorithms, and Hardware Mechanics of LLM Quantization
+    LLM Quantization: How to Run Big Models on Tiny Hardware
   
 
     
@@ -446,7 +446,7 @@
   <span class="md-ellipsis">
     
   
-    Reinforcement Learning from Human Feedback (RLHF): Aligning Large Language Models for Precision, Safety, and Reasoning
+    Deep Reinforcement Learning from Human Feedback: RLHF Explained
   
 
     
@@ -473,7 +473,7 @@
   <span class="md-ellipsis">
     
   
-    Inside an LLM Inference Engine
+    Sequence to Sequence Models: An Overview
   
 
     
@@ -500,7 +500,7 @@
   <span class="md-ellipsis">
     
   
-    The Mechanics and Industrial Economics of Tokenization in Large Language Models
+    Tokenization: How AI Understands Language
   
 
     
@@ -527,7 +527,7 @@
   <span class="md-ellipsis">
     
   
-    Vector Databases and High-Performance Retrieval-Augmented Generation (RAG): Architecture, Indexing Algorithms, and Comparative Analysis
+    Vector Databases: The Memory of AI Agents
   
 
     
@@ -563,7 +563,7 @@
   <span class="md-ellipsis">
     
   
-    vLLM: High-Throughput, Memory-Efficient LLM Serving — Technical, Architectural, Commercial, and Product Analysis
+    How vLLM Works Internally
   
 
     
@@ -581,7 +581,7 @@
   <span class="md-ellipsis">
     
   
-    vLLM: High-Throughput, Memory-Efficient LLM Serving — Technical, Architectural, Commercial, and Product Analysis
+    How vLLM Works Internally
   
 
     
@@ -1113,7 +1113,7 @@
 
 
 
-<h1 id="vllm-high-throughput-memory-efficient-llm-serving-technical-architectural-commercial-and-product-analysis">vLLM: High-Throughput, Memory-Efficient LLM Serving — Technical, Architectural, Commercial, and Product Analysis<a class="headerlink" href="#vllm-high-throughput-memory-efficient-llm-serving-technical-architectural-commercial-and-product-analysis" title="Permanent link">&para;</a></h1>
+<h1 id="how-vllm-works-internally">How vLLM Works Internally<a class="headerlink" href="#how-vllm-works-internally" title="Permanent link">&para;</a></h1>
 <hr />
 <h2 id="1-executive-summary-product-overview">1. Executive Summary &amp; Product Overview<a class="headerlink" href="#1-executive-summary-product-overview" title="Permanent link">&para;</a></h2>
 <p>In the generative artificial intelligence infrastructure ecosystem, <strong>vLLM</strong> has emerged as the definitive open-source inference and model-serving engine. Originating from research at UC Berkeley's Sky Computing Lab (Kwon et al., SOSP 2023) and maintained by the open-source community alongside LMSYS Org, vLLM resolved the single largest bottleneck in production LLM deployment: <strong>GPU memory fragmentation and bandwidth throttling during autoregressive decoding</strong>.</p>

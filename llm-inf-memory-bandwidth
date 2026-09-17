@@ -1,5 +1,4 @@
-# Mastering Memory Bandwidth and Capacity in LLM Inference: Architectures, Optimizations, and Latency Mitigation
-
+# Why LLM Inference Is a Memory Bandwidth Problem
 ---
 
 ## 1. Introduction: The Memory-Bound Physics of LLM Inference

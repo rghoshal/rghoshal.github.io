@@ -23,7 +23,7 @@
     
     
       
-        <title>Introduction - AI Engineering Handbook</title>
+        <title>FlashAttention Explained Without the Math - AI Engineering Handbook</title>
       
     
     
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#introduction" class="md-skip">
+        <a href="#flashattention-explained-without-the-math" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Introduction
+              FlashAttention Explained Without the Math
             
           </span>
         </div>
@@ -232,7 +232,7 @@
   <span class="md-ellipsis">
     
   
-    Introduction
+    Agentic AI: How AI Agents Use Tools to Solve Problems
   
 
     
@@ -259,7 +259,7 @@
   <span class="md-ellipsis">
     
   
-    Introduction
+    Continuous Batching: The Secret Behind High-Throughput LLM Serving
   
 
     
@@ -286,7 +286,7 @@
   <span class="md-ellipsis">
     
   
-    Standard Engineering Blueprint: Designing and Implementing a Production-Grade Enterprise LLM Serving Platform
+    Designing a Production-Grade LLM Serving Platform
   
 
     
@@ -322,7 +322,7 @@
   <span class="md-ellipsis">
     
   
-    Introduction
+    FlashAttention Explained Without the Math
   
 
     
@@ -350,7 +350,7 @@
   <span class="md-ellipsis">
     
   
-    The Future of LLM Inference: From Hardware-Software Co-Design to Evolutionary Industrial Intelligence
+    The Future of LLM Inference: Speculative Decoding, MoE, and Disaggregated Serving
   
 
     
@@ -377,7 +377,7 @@
   <span class="md-ellipsis">
     
   
-    Inside an LLM Inference Engine
+    Inside an LLM Inference Engine: From Prompt to Generated Token
   
 
     
@@ -404,7 +404,7 @@
   <span class="md-ellipsis">
     
   
-    The Mechanics, Mathematics, and Hardware Architecture of Key-Value (KV) Caching in Large Language Models
+    KV Cache: The Innovation That Made Modern LLMs Practical
   
 
     
@@ -431,7 +431,7 @@
   <span class="md-ellipsis">
     
   
-    The Mathematics, Algorithms, and Hardware Mechanics of LLM Quantization
+    LLM Quantization: How to Run Big Models on Tiny Hardware
   
 
     
@@ -458,7 +458,7 @@
   <span class="md-ellipsis">
     
   
-    Reinforcement Learning from Human Feedback (RLHF): Aligning Large Language Models for Precision, Safety, and Reasoning
+    Deep Reinforcement Learning from Human Feedback: RLHF Explained
   
 
     
@@ -485,7 +485,7 @@
   <span class="md-ellipsis">
     
   
-    Inside an LLM Inference Engine
+    Sequence to Sequence Models: An Overview
   
 
     
@@ -512,7 +512,7 @@
   <span class="md-ellipsis">
     
   
-    The Mechanics and Industrial Economics of Tokenization in Large Language Models
+    Tokenization: How AI Understands Language
   
 
     
@@ -539,7 +539,7 @@
   <span class="md-ellipsis">
     
   
-    Vector Databases and High-Performance Retrieval-Augmented Generation (RAG): Architecture, Indexing Algorithms, and Comparative Analysis
+    Vector Databases: The Memory of AI Agents
   
 
     
@@ -566,7 +566,7 @@
   <span class="md-ellipsis">
     
   
-    vLLM: High-Throughput, Memory-Efficient LLM Serving — Technical, Architectural, Commercial, and Product Analysis
+    How vLLM Works Internally
   
 
     
@@ -614,7 +614,7 @@
 
 
 
-<h1 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h1>
+<h1 id="flashattention-explained-without-the-math">FlashAttention Explained Without the Math<a class="headerlink" href="#flashattention-explained-without-the-math" title="Permanent link">&para;</a></h1>
 <p>Flash Attention , in its most fundamental sense , is an optimization algorithm for calculating the attention mechanism in Transformer models . It addresses the major performance bottleneck associated with the standard implementation of attention , namely the quadratic time complexity of the attention mechanism with respect to the sequence length.</p>
 <h1 id="the-standard-attention-mechanism">The Standard Attention Mechanism<a class="headerlink" href="#the-standard-attention-mechanism" title="Permanent link">&para;</a></h1>
 <p>The attention mechanism is the heart of the Transformer architecture . It allows the model to weigh the importance of different parts of the input sequence when generating the output sequence. The standard attention mechanism is calculated as follows :</p>
