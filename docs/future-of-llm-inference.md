@@ -1,5 +1,4 @@
-# The Future of LLM Inference: From Hardware-Software Co-Design to Evolutionary Industrial Intelligence
-
+# The Future of LLM Inference: Speculative Decoding, MoE, and Disaggregated Serving
 ---
 
 ## Introduction

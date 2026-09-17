@@ -1,5 +1,4 @@
-# The Mathematics, Algorithms, and Hardware Mechanics of LLM Quantization
-
+# LLM Quantization: How to Run Big Models on Tiny Hardware
 ---
 
 ## 1. Introduction: The Precision-Performance Trade-off

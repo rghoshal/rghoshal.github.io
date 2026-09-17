@@ -1,4 +1,4 @@
-# Reinforcement Learning from Human Feedback (RLHF): Aligning Large Language Models for Precision, Safety, and Reasoning
+# Deep Reinforcement Learning from Human Feedback: RLHF Explained
 
 ---
 

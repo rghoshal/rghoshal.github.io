@@ -1,5 +1,4 @@
-# Vector Databases and High-Performance Retrieval-Augmented Generation (RAG): Architecture, Indexing Algorithms, and Comparative Analysis
-
+# Vector Databases: The Memory of AI Agents
 ---
 
 ## 1. Introduction: The Problem That Vector Databases Solve

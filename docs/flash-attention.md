@@ -1,4 +1,4 @@
-# Introduction
+# FlashAttention Explained Without the Math
 Flash Attention , in its most fundamental sense , is an optimization algorithm for calculating the attention mechanism in Transformer models . It addresses the major performance bottleneck associated with the standard implementation of attention , namely the quadratic time complexity of the attention mechanism with respect to the sequence length.
 
 # The Standard Attention Mechanism

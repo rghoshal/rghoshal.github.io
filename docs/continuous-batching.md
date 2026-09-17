@@ -1,3 +1,6 @@
+# Continuous Batching: The Secret Behind High-Throughput LLM Serving
+----
+
 # Introduction
 
 In its quest to generate the next "best" token, Large Language Models (LLMs) face a significant challenge: the inference latency can be substantial, especially when generating long sequences of text. This is because the model has to perform a forward pass through the entire network for each token it generates. While this approach is simple and effective for short sequences, it becomes prohibitively expensive for long sequences. To address this, researchers have developed various optimization techniques, one of which is continuous batching.

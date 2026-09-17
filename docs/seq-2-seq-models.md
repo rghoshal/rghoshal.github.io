@@ -1,8 +1,5 @@
-# Inside an LLM Inference Engine
-### Chapter 1 — From User Prompt to Self-Attention
-
+# Sequence to Sequence Models: An Overview
 ---
-
 ## Introduction
 
 Large Language Models (LLMs) have rapidly become one of the most influential technologies driving modern Artificial Intelligence. Whether the task involves answering questions, summarizing documents, writing software, generating images, or assisting autonomous agents, every interaction with an LLM begins with a common objective: understanding the user's intent and producing the most appropriate response.

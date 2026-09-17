@@ -1,4 +1,4 @@
-# vLLM: High-Throughput, Memory-Efficient LLM Serving — Technical, Architectural, Commercial, and Product Analysis
+# How vLLM Works Internally
 
 ---
 

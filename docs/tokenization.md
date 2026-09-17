@@ -1,4 +1,4 @@
-# The Mechanics and Industrial Economics of Tokenization in Large Language Models
+# Tokenization: How AI Understands Language
 
 ---
 

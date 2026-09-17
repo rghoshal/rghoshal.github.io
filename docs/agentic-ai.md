@@ -1,3 +1,6 @@
+# Agentic AI: How AI Agents Use Tools to Solve Problems
+--------
+
 # Introduction
 The onset of agentic AI has given modern software development one big edge. And that is the imparting of an added liberty to think of automating that aspects of application maintenance and development which were previously 
 not so well-scoped from an automation perspective. Thanks to AI and the agentic capabilities that companies like Langchain , LlamaIndex and Pydantic have provided over the recent years , many areas of sofware engineering and application architecture are opening up for widespread research on how to use AI to ease the corresponding pains inflicting individual areas covered in that discipline. Which in turn may lead to optimization in costs , effort and performance of the application from both a delivery and revenue perspective.

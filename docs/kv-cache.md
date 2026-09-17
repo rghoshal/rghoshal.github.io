@@ -1,5 +1,4 @@
-# The Mechanics, Mathematics, and Hardware Architecture of Key-Value (KV) Caching in Large Language Models
-
+# KV Cache: The Innovation That Made Modern LLMs Practical
 ---
 
 ## 1. Introduction

@@ -6,7 +6,7 @@ This site contains deep technical articles on machine learning
 and deep learning from an intuitive as well as mathematical
 perspective.  
 
-- Sequence to Sequence Models  
+- Sequence to Sequence Models: An Overview  
 - Inside an LLM Inference Engine: From Prompt to Generated Token
 - KV Cache: The Innovation That Made Modern LLMs Practical
 - Continuous Batching: The Secret Behind High-Throughput LLM Serving
@@ -24,7 +24,7 @@ perspective.
 
 Start here:
 
-- [Sequence to Sequence Models](seq-2-seq-models.md)
+- [Sequence to Sequence Models: An Overview](seq-2-seq-models.md)
 - [Inside an LLM Inference Engine: From Prompt to Generated Token](inside-llm-inference.md)
 - [KV Cache: The Innovation That Made Modern LLMs Practical](kv-cache.md)
 - [Continuous Batching: The Secret Behind High-Throughput LLM Serving](continuous-batching.md)

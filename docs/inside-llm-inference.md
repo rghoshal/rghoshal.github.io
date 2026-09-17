@@ -1,6 +1,4 @@
-# Inside an LLM Inference Engine
-### Chapter 1 — From User Prompt to Self-Attention
-
+# Inside an LLM Inference Engine: From Prompt to Generated Token
 ---
 
 ## Introduction

@@ -1,4 +1,4 @@
-# Standard Engineering Blueprint: Designing and Implementing a Production-Grade Enterprise LLM Serving Platform
+# Designing a Production-Grade LLM Serving Platform
 
 ---
 
