@@ -1,0 +1,1507 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../kv-cache/">
+      
+      
+        <link rel="next" href="../rlhf/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>The Mathematics, Algorithms, and Hardware Mechanics of LLM Quantization - AI Engineering Handbook</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#the-mathematics-algorithms-and-hardware-mechanics-of-llm-quantization" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="AI Engineering Handbook" class="md-header__button md-logo" aria-label="AI Engineering Handbook" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI Engineering Handbook
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              The Mathematics, Algorithms, and Hardware Mechanics of LLM Quantization
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AI Engineering Handbook" class="md-nav__button md-logo" aria-label="AI Engineering Handbook" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI Engineering Handbook
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Engineering Handbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agentic-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../continuous-batching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../design-prod-grade-llm-serving-platform/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Standard Engineering Blueprint: Designing and Implementing a Production-Grade Enterprise LLM Serving Platform
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flash-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../future-of-llm-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Future of LLM Inference: From Hardware-Software Co-Design to Evolutionary Industrial Intelligence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../inside-llm-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inside an LLM Inference Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Mechanics, Mathematics, and Hardware Architecture of Key-Value (KV) Caching in Large Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Mathematics, Algorithms, and Hardware Mechanics of LLM Quantization
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Mathematics, Algorithms, and Hardware Mechanics of LLM Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-introduction-the-precision-performance-trade-off" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Introduction: The Precision-Performance Trade-off
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-mathematical-foundations-of-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Mathematical Foundations of Quantization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Mathematical Foundations of Quantization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-uniform-affine-asymmetric-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Uniform Affine (Asymmetric) Quantization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.1 Uniform Affine (Asymmetric) Quantization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dequantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dequantization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-symmetric-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Symmetric Quantization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-quantization-granularity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Quantization Granularity
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-numerical-data-formats-floating-point-vs-integer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Numerical Data Formats: Floating-Point vs. Integer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-major-quantization-methodologies-for-llms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Major Quantization Methodologies for LLMs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Major Quantization Methodologies for LLMs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-weight-only-post-training-quantization-w4a16-w8a16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Weight-Only Post-Training Quantization (W4A16 / W8A16)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 Weight-Only Post-Training Quantization (W4A16 / W8A16)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-gptq-generalized-post-training-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. GPTQ (Generalized Post-Training Quantization)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-awq-activation-aware-weight-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. AWQ (Activation-Aware Weight Quantization)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-weight-activation-quantization-w8a8-w4a4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Weight-Activation Quantization (W8A8 / W4A4)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.2 Weight-Activation Quantization (W8A8 / W4A4)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-the-emergent-outlier-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. The Emergent Outlier Problem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-smoothquant" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. SmoothQuant
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-quantization-aware-fine-tuning-qlora" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Quantization-Aware Fine-Tuning: QLoRA
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-systems-and-performance-gains-memory-bandwidth-and-energy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Systems and Performance Gains: Memory, Bandwidth, and Energy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Systems and Performance Gains: Memory, Bandwidth, and Energy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-arithmetic-intensity-shift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Arithmetic Intensity Shift
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-energy-efficiency-silicon-footprint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Energy Efficiency &amp; Silicon Footprint
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-challenges-and-failure-modes-in-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Challenges and Failure Modes in Quantization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Conclusion
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rlhf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforcement Learning from Human Feedback (RLHF): Aligning Large Language Models for Precision, Safety, and Reasoning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../seq-2-seq-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inside an LLM Inference Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tokenization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Mechanics and Industrial Economics of Tokenization in Large Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vector-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vector Databases and High-Performance Retrieval-Augmented Generation (RAG): Architecture, Indexing Algorithms, and Comparative Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vllm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    vLLM: High-Throughput, Memory-Efficient LLM Serving — Technical, Architectural, Commercial, and Product Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-introduction-the-precision-performance-trade-off" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Introduction: The Precision-Performance Trade-off
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-mathematical-foundations-of-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Mathematical Foundations of Quantization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Mathematical Foundations of Quantization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-uniform-affine-asymmetric-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Uniform Affine (Asymmetric) Quantization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.1 Uniform Affine (Asymmetric) Quantization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dequantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dequantization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-symmetric-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Symmetric Quantization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-quantization-granularity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Quantization Granularity
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-numerical-data-formats-floating-point-vs-integer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Numerical Data Formats: Floating-Point vs. Integer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-major-quantization-methodologies-for-llms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Major Quantization Methodologies for LLMs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Major Quantization Methodologies for LLMs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-weight-only-post-training-quantization-w4a16-w8a16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Weight-Only Post-Training Quantization (W4A16 / W8A16)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1 Weight-Only Post-Training Quantization (W4A16 / W8A16)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-gptq-generalized-post-training-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. GPTQ (Generalized Post-Training Quantization)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-awq-activation-aware-weight-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. AWQ (Activation-Aware Weight Quantization)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-weight-activation-quantization-w8a8-w4a4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Weight-Activation Quantization (W8A8 / W4A4)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.2 Weight-Activation Quantization (W8A8 / W4A4)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-the-emergent-outlier-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. The Emergent Outlier Problem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-smoothquant" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. SmoothQuant
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-quantization-aware-fine-tuning-qlora" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Quantization-Aware Fine-Tuning: QLoRA
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-systems-and-performance-gains-memory-bandwidth-and-energy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Systems and Performance Gains: Memory, Bandwidth, and Energy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Systems and Performance Gains: Memory, Bandwidth, and Energy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-arithmetic-intensity-shift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Arithmetic Intensity Shift
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-energy-efficiency-silicon-footprint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Energy Efficiency &amp; Silicon Footprint
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-challenges-and-failure-modes-in-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Challenges and Failure Modes in Quantization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Conclusion
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="the-mathematics-algorithms-and-hardware-mechanics-of-llm-quantization">The Mathematics, Algorithms, and Hardware Mechanics of LLM Quantization<a class="headerlink" href="#the-mathematics-algorithms-and-hardware-mechanics-of-llm-quantization" title="Permanent link">&para;</a></h1>
+<hr />
+<h2 id="1-introduction-the-precision-performance-trade-off">1. Introduction: The Precision-Performance Trade-off<a class="headerlink" href="#1-introduction-the-precision-performance-trade-off" title="Permanent link">&para;</a></h2>
+<p>In the deployment of Large Language Models (LLMs), the sheer scale of modern model architectures presents a formidable barrier. A 70-billion-parameter foundation model stored in standard 16-bit floating-point format (<span class="arithmatex">\(\text{FP16}\)</span> or <span class="arithmatex">\(\text{BF16}\)</span>) requires <strong><span class="arithmatex">\(\approx 140\text{ GB}\)</span> of High Bandwidth Memory (HBM)</strong> purely to load static model weights, excluding the dynamic memory required for Key-Value (KV) caching and runtime activations.</p>
+<p>This memory footprint fundamentally constrains inference throughput, escalates infrastructure costs, and prevents deployment on resource-constrained edge accelerators.</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                    The Core Proposition of Quantization                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   High-Precision Continuous Domain             Low-Precision Discrete Domain│
+│   [ FP32 / FP16 / BF16 ]                       [ FP8 / INT8 / INT4 / 1-bit ]│
+│   • 16 to 32 bits per value                    • 1 to 8 bits per value      │
+│   • Enormous dynamic range                     • Bounded discrete grid      │
+│   • Memory Bandwidth Bottleneck                • 2x to 8x Throughput Surge  │
+│                                                                             │
+│                                                                             │
+│             Loss of Precision ──────► Massive Memory &amp; Compute Gain         │
+│          (Controlled Discretization)     (Accelerated Memory Bandwidth)     │
+└─────────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<p><strong>Quantization</strong> is the process of mapping high-precision, continuous numerical representations (e.g., 32-bit or 16-bit floating-point numbers) to lower-precision, discrete numerical formats (e.g., 8-bit, 4-bit, or ternary integer/floating-point values). </p>
+<p>While quantization intentionally introduces a <strong>loss of mathematical precision</strong>, modern deep neural networks—and LLMs in particular—exhibit remarkable <strong>overparameterization and structural redundancy</strong>. By applying mathematically principled quantization algorithms, systems engineers can achieve <strong><span class="arithmatex">\(2\times\)</span> to <span class="arithmatex">\(8\times\)</span> memory compression</strong> and <strong><span class="arithmatex">\(2\times\)</span> to <span class="arithmatex">\(4\times\)</span> inference speedups</strong> with near-zero loss in downstream reasoning accuracy and perplexity.</p>
+<hr />
+<h2 id="2-mathematical-foundations-of-quantization">2. Mathematical Foundations of Quantization<a class="headerlink" href="#2-mathematical-foundations-of-quantization" title="Permanent link">&para;</a></h2>
+<p>At its core, quantization projects a real continuous value <span class="arithmatex">\(x \in [\alpha, \beta] \subset \mathbb{R}\)</span> onto a finite set of <span class="arithmatex">\(2^b\)</span> discrete quantization bins, where <span class="arithmatex">\(b\)</span> is the target bit-width.</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                       Uniform Quantization Function                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│        Continuous Real Line (FP16):                                         │
+│        ◄───────|──────────────|──────────────|──────────────|───────►       │
+│               -3.4           -1.1           +0.8           +2.9             │
+│                        │              │              │                      │
+│                        ▼  (Scale S, Zero-Point Z, Rounding, Clamping)       │
+│                                                                             │
+│        Discrete Quantized Grid (INT4: -8 to +7):                            │
+│        ◄───────[■]────────────[■]────────────[■]────────────[■]───────►     │
+│                -8             -3              +2             +7             │
+└─────────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="21-uniform-affine-asymmetric-quantization">2.1 Uniform Affine (Asymmetric) Quantization<a class="headerlink" href="#21-uniform-affine-asymmetric-quantization" title="Permanent link">&para;</a></h3>
+<p>The standard uniform affine quantization function maps a real tensor <span class="arithmatex">\(\mathbf{X}\)</span> to an integer grid <span class="arithmatex">\(\mathbf{X}_q \in [q_{\min}, q_{\max}]\)</span>:</p>
+<div class="arithmatex">\[\mathbf{X}_q = \text{clip}\left( \left\lfloor \frac{\mathbf{X}}{S} \right\rceil + Z, \; q_{\min}, \; q_{\max} \right)\]</div>
+<p>where:
+* <span class="arithmatex">\(\lfloor \cdot \rceil\)</span> denotes a rounding-to-nearest-integer operation.
+* <span class="arithmatex">\(\text{clip}(v, a, b) = \max(a, \min(v, b))\)</span>.
+* <span class="arithmatex">\(S \in \mathbb{R}^+\)</span> is the <strong>Scale Factor</strong>, defining the step size between consecutive discrete levels.
+* <span class="arithmatex">\(Z \in \mathbb{Z}\)</span> is the <strong>Zero-Point</strong>, ensuring that the real value <span class="arithmatex">\(0.0\)</span> maps exactly to an integer in the quantized space (vital for zero-padding in convolutional/attention layers).</p>
+<p>The scale factor <span class="arithmatex">\(S\)</span> and zero-point <span class="arithmatex">\(Z\)</span> are derived from the real tensor's dynamic range <span class="arithmatex">\([\alpha, \beta] = [\min(\mathbf{X}), \max(\mathbf{X})]\)</span>:</p>
+<div class="arithmatex">\[S = \frac{\beta - \alpha}{q_{\max} - q_{\min}}\]</div>
+<div class="arithmatex">\[Z = \text{clip}\left( \left\lfloor \frac{-\alpha}{S} \right\rceil + q_{\min}, \; q_{\min}, \; q_{\max} \right)\]</div>
+<h4 id="dequantization">Dequantization<a class="headerlink" href="#dequantization" title="Permanent link">&para;</a></h4>
+<p>To reconstruct the approximated floating-point tensor <span class="arithmatex">\(\hat{\mathbf{X}} \approx \mathbf{X}\)</span>:</p>
+<div class="arithmatex">\[\hat{\mathbf{X}} = S \cdot (\mathbf{X}_q - Z)\]</div>
+<p>The quantization error (or distortion) is defined as:</p>
+<div class="arithmatex">\[\mathbf{E} = \mathbf{X} - \hat{\mathbf{X}} = \mathbf{X} - S \cdot \left( \text{clip}\left( \left\lfloor \frac{\mathbf{X}}{S} \right\rceil + Z, q_{\min}, q_{\max} \right) - Z \right)\]</div>
+<hr />
+<h3 id="22-symmetric-quantization">2.2 Symmetric Quantization<a class="headerlink" href="#22-symmetric-quantization" title="Permanent link">&para;</a></h3>
+<p>When the distribution of values is approximately symmetric around zero, setting <span class="arithmatex">\(Z = 0\)</span> simplifies hardware computation:</p>
+<div class="arithmatex">\[S = \frac{\max(|\mathbf{X}|)}{q_{\max}}\]</div>
+<div class="arithmatex">\[\mathbf{X}_q = \text{clip}\left( \left\lfloor \frac{\mathbf{X}}{S} \right\rceil, \; -q_{\max}, \; q_{\max} \right)\]</div>
+<div class="arithmatex">\[\hat{\mathbf{X}} = S \cdot \mathbf{X}_q\]</div>
+<p><strong>Hardware Benefit</strong>: In symmetric quantization, matrix multiplications simplify because the zero-point cross-terms vanish:
+$<span class="arithmatex">\(\mathbf{Y} = \mathbf{X}\mathbf{W} \approx (S_X \mathbf{X}_q)(S_W \mathbf{W}_q) = (S_X S_W) \cdot (\mathbf{X}_q \mathbf{W}_q)\)</span>$
+The core matrix multiplication <span class="arithmatex">\((\mathbf{X}_q \mathbf{W}_q)\)</span> executes entirely using ultra-fast integer tensor cores (e.g., <code>DP4A</code> or <code>INT8 Tensor Core MMA</code> instructions), followed by a single floating-point scalar scaling per tile.</p>
+<hr />
+<h3 id="23-quantization-granularity">2.3 Quantization Granularity<a class="headerlink" href="#23-quantization-granularity" title="Permanent link">&para;</a></h3>
+<p>The choice of scale sharing directly governs the trade-off between numerical accuracy and memory overhead:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                       Granularity of Scale Factors                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  1. Per-Tensor:         Single S for entire weight matrix W (Low overhead,  │
+│                         poor accuracy with outliers)                        │
+│                                                                             │
+│  2. Per-Channel:        One S per output row/column (Standard for weights) │
+│                                                                             │
+│  3. Group-wise / Block: Matrix partitioned into small blocks (e.g., g=64);  │
+│                         independent S per group (High accuracy, best for    │
+│                         INT4/INT2 regimes)                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<ol>
+<li><strong>Per-Tensor Quantization</strong>: A single scale factor <span class="arithmatex">\(S\)</span> for the entire tensor matrix <span class="arithmatex">\(\mathbf{W} \in \mathbb{R}^{d_{\text{in}} \times d_{\text{out}}}\)</span>. Outliers in one channel degrade quantization resolution for all other channels.</li>
+<li><strong>Per-Channel (Per-Row/Per-Column) Quantization</strong>: Each row or column maintains its own scale factor <span class="arithmatex">\(S_i\)</span>. This isolates variance across channels, preserving accuracy with negligible memory overhead (<span class="arithmatex">\(O(d_{\text{out}})\)</span> scales).</li>
+<li><strong>Group-wise (Block-wise) Quantization</strong>: The weight tensor is partitioned into contiguous sub-vectors of size <span class="arithmatex">\(g\)</span> (typically <span class="arithmatex">\(g \in \{32, 64, 128\}\)</span>), with an independent scale factor <span class="arithmatex">\(S_{i, j}\)</span> for each group. This is the gold standard for sub-4-bit quantization (AWQ, GPTQ).</li>
+</ol>
+<hr />
+<h2 id="3-numerical-data-formats-floating-point-vs-integer">3. Numerical Data Formats: Floating-Point vs. Integer<a class="headerlink" href="#3-numerical-data-formats-floating-point-vs-integer" title="Permanent link">&para;</a></h2>
+<p>Modern AI accelerators support a rich hierarchy of numerical representations:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                    Bit-Level Layout of Common AI Data Formats               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  FP16 (16-bit):  [ Sign: 1 ] [ Exponent: 5 bits  ] [ Mantissa: 10 bits   ]  │
+│  BF16 (16-bit):  [ Sign: 1 ] [ Exponent: 8 bits  ] [ Mantissa: 7 bits    ]  │
+│                                                                             │
+│  FP8 E4M3:       [ Sign: 1 ] [ Exponent: 4 bits  ] [ Mantissa: 3 bits    ]  │
+│  FP8 E5M2:       [ Sign: 1 ] [ Exponent: 5 bits  ] [ Mantissa: 2 bits    ]  │
+│                                                                             │
+│  INT8 (8-bit):   [ Sign: 1 ] [ Two's Complement Integer Magnitude: 7 b   ]  │
+│  INT4 (4-bit):   [ Sign: 1 ] [ Two's Complement Integer Magnitude: 3 b   ]  │
+│  Ternary (1.58b):[ Value in {-1, 0, +1} mapped to 2-bit binary integer   ]  │
+└─────────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Data Format</th>
+<th style="text-align: left;">Bit Width</th>
+<th style="text-align: left;">Exponent / Mantissa</th>
+<th style="text-align: left;">Dynamic Range</th>
+<th style="text-align: left;">Primary Usage / Hardware Support</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>FP16</strong></td>
+<td style="text-align: left;">16</td>
+<td style="text-align: left;">5 / 10</td>
+<td style="text-align: left;"><span class="arithmatex">\(\approx 10^{-5}\)</span> to <span class="arithmatex">\(6.5 \times 10^4\)</span></td>
+<td style="text-align: left;">Standard training &amp; baseline inference</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>BF16</strong></td>
+<td style="text-align: left;">16</td>
+<td style="text-align: left;">8 / 7</td>
+<td style="text-align: left;"><span class="arithmatex">\(\approx 10^{-38}\)</span> to <span class="arithmatex">\(3.4 \times 10^{38}\)</span></td>
+<td style="text-align: left;">Preferred pretraining format (matches FP32 range)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>FP8 (E4M3)</strong></td>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">4 / 3</td>
+<td style="text-align: left;"><span class="arithmatex">\(\approx 10^{-2}\)</span> to <span class="arithmatex">\(4.48 \times 10^2\)</span></td>
+<td style="text-align: left;">Inference weights &amp; forward activations (NVIDIA Hopper/Blackwell)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>FP8 (E5M2)</strong></td>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">5 / 2</td>
+<td style="text-align: left;"><span class="arithmatex">\(\approx 10^{-5}\)</span> to <span class="arithmatex">\(5.73 \times 10^4\)</span></td>
+<td style="text-align: left;">Gradients, KV-cache, and high dynamic range layers</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>INT8</strong></td>
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">N/A (Linear)</td>
+<td style="text-align: left;"><span class="arithmatex">\([-128, 127]\)</span></td>
+<td style="text-align: left;">Classic post-training integer inference</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>INT4</strong></td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">N/A (Linear)</td>
+<td style="text-align: left;"><span class="arithmatex">\([-8, 7]\)</span></td>
+<td style="text-align: left;">Weight-only quantized LLMs (AWQ, GPTQ)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>NVFP4</strong></td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">2 / 1 (Microscaled)</td>
+<td style="text-align: left;">Varied per tile</td>
+<td style="text-align: left;">Native Blackwell sub-byte tensor core format</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Ternary (BitNet)</strong></td>
+<td style="text-align: left;">1.58</td>
+<td style="text-align: left;">N/A</td>
+<td style="text-align: left;"><span class="arithmatex">\(\{-1, 0, +1\}\)</span></td>
+<td style="text-align: left;">Zero-multiplication integer addition architectures</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-major-quantization-methodologies-for-llms">4. Major Quantization Methodologies for LLMs<a class="headerlink" href="#4-major-quantization-methodologies-for-llms" title="Permanent link">&para;</a></h2>
+<p>Quantization approaches are broadly categorized into <strong>Post-Training Quantization (PTQ)</strong> and <strong>Quantization-Aware Training (QAT)</strong>.</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                    Taxonomy of LLM Quantization Algorithms                  │
+├──────────────────────────────────────┬──────────────────────────────────────┤
+│  Post-Training Quantization (PTQ)    │  Quantization-Aware Fine-Tuning (QAT)│
+├──────────────────────────────────────┼──────────────────────────────────────┤
+│  • Weight-Only (W4A16, W8A16)        │  • QLoRA (NF4 + Double Quantization) │
+│    - GPTQ (Second-order Hessian)     │  • Straight-Through Estimator (STE)  │
+│    - AWQ (Activation-aware scaling)  │  • Distillation-based QAT            │
+│  • Weight-Activation (W8A8, W4A4)    │                                      │
+│    - SmoothQuant (Channel migration) │                                      │
+│    - LLM.int8() (Outlier separation) │                                      │
+└──────────────────────────────────────┴──────────────────────────────────────┘
+</code></pre>
+<hr />
+<h3 id="41-weight-only-post-training-quantization-w4a16-w8a16">4.1 Weight-Only Post-Training Quantization (W4A16 / W8A16)<a class="headerlink" href="#41-weight-only-post-training-quantization-w4a16-w8a16" title="Permanent link">&para;</a></h3>
+<p>In memory-bound autoregressive decoding, memory bandwidth is dominated by reading model weights. Weight-only quantization compresses weights to 4-bit or 8-bit while keeping activations in 16-bit floating point (<span class="arithmatex">\(\text{W4A16}\)</span>). During computation, weights are dequantized on-the-fly in fast on-chip SRAM registers before matrix multiplication.</p>
+<h4 id="a-gptq-generalized-post-training-quantization">A. GPTQ (Generalized Post-Training Quantization)<a class="headerlink" href="#a-gptq-generalized-post-training-quantization" title="Permanent link">&para;</a></h4>
+<p>GPTQ frames quantization as an optimal brain surgeon optimization problem. For a weight matrix <span class="arithmatex">\(\mathbf{W}\)</span> and input calibration activations <span class="arithmatex">\(\mathbf{X}\)</span>, GPTQ minimizes the squared output error:</p>
+<div class="arithmatex">\[\min_{\hat{\mathbf{W}}} \|\mathbf{W}\mathbf{X} - \hat{\mathbf{W}}\mathbf{X}\|_2^2\]</div>
+<p>Using a second-order Taylor expansion, the optimal quantization step for weight column <span class="arithmatex">\(q\)</span> updates the remaining unquantized weights <span class="arithmatex">\(\mathbf{W}_{:, &gt;q}\)</span> using the inverse Hessian matrix <span class="arithmatex">\(\mathbf{H} = 2\mathbf{X}\mathbf{X}^T\)</span>:</p>
+<div class="arithmatex">\[\mathbf{W}_{:, &gt;q} \leftarrow \mathbf{W}_{:, &gt;q} - \frac{w_q - \text{quant}(w_q)}{[\mathbf{H}^{-1}]_{qq}} \cdot \mathbf{H}^{-1}_{:, &gt;q}\]</div>
+<p><strong>Impact</strong>: Quantizes a 70B model to 4-bit in under 4 GPU hours with minimal loss in perplexity.</p>
+<h4 id="b-awq-activation-aware-weight-quantization">B. AWQ (Activation-Aware Weight Quantization)<a class="headerlink" href="#b-awq-activation-aware-weight-quantization" title="Permanent link">&para;</a></h4>
+<p>AWQ observes that <strong>not all weights are equally important</strong>. By inspecting the activation magnitudes <span class="arithmatex">\(\mathbf{S}_X = \frac{1}{N}\sum |\mathbf{X}|\)</span>, AWQ identifies the top 1% of salient weight channels that carry critical semantic information.</p>
+<p>Rather than keeping salient weights in FP16 (which creates hardware execution divergence), AWQ applies a per-channel protection scale <span class="arithmatex">\(s &gt; 1\)</span>:</p>
+<div class="arithmatex">\[\mathbf{W}' = \mathbf{W} \cdot \text{diag}(s), \quad \mathbf{X}' = \text{diag}(s)^{-1} \cdot \mathbf{X}\]</div>
+<div class="arithmatex">\[\mathbf{W}'\mathbf{X}' = (\mathbf{W} \cdot \text{diag}(s))(\text{diag}(s)^{-1} \cdot \mathbf{X}) = \mathbf{W}\mathbf{X}\]</div>
+<p>By mathematically scaling down the activation outliers and scaling up the weights prior to group-wise quantization, the relative quantization error on salient channels is minimized.</p>
+<hr />
+<h3 id="42-weight-activation-quantization-w8a8-w4a4">4.2 Weight-Activation Quantization (W8A8 / W4A4)<a class="headerlink" href="#42-weight-activation-quantization-w8a8-w4a4" title="Permanent link">&para;</a></h3>
+<p>To accelerate both compute-bound prefill phases and memory-bound decode phases, both weights and activations must be quantized (<span class="arithmatex">\(\text{W8A8}\)</span>). This enables true integer matrix multiplications (<span class="arithmatex">\(\text{INT8} \times \text{INT8} \rightarrow \text{INT32}\)</span>) on hardware Tensor Cores.</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                   The SmoothQuant Activation-Weight Migration               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   Raw Activations (Severe Outliers)          Raw Weights (Smooth)           │
+│   [  0.1   120.5    0.2   -85.4  ]     x    [  0.4   -0.2    0.1    0.3  ]  │
+│                  │                                       │                  │
+│                  ▼                                       ▼                  │
+│   Divide Activations by Scale s              Multiply Weights by Scale s    │
+│                  │                                       │                  │
+│                  ▼                                       ▼                  │
+│   Smoothed Activations (Easy INT8)          Smoothed Weights (Easy INT8)    │
+│   [  0.5     1.2    0.4    -1.1  ]     x    [  2.4   -1.8    0.6    1.5  ]  │
+│                                                                             │
+│   Result: INT8 x INT8 Tensor Core Matrix Multiplication with Zero Outliers! │
+└─────────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h4 id="a-the-emergent-outlier-problem">A. The Emergent Outlier Problem<a class="headerlink" href="#a-the-emergent-outlier-problem" title="Permanent link">&para;</a></h4>
+<p>In models exceeding <span class="arithmatex">\(6.7\text{B}\)</span> parameters, activation tensors exhibit <strong>emergent systematic outliers</strong>—specific feature dimensions whose magnitudes reach <span class="arithmatex">\(100\times\)</span> the average activation value. In standard per-tensor or per-token activation quantization, these outliers force the scale factor <span class="arithmatex">\(S\)</span> to expand, destroying the quantization resolution for all non-outlier channels.</p>
+<h4 id="b-smoothquant">B. SmoothQuant<a class="headerlink" href="#b-smoothquant" title="Permanent link">&para;</a></h4>
+<p>SmoothQuant solves this by mathematically migrating the quantization difficulty from activations to weights. Because weights have a uniform, narrow dynamic range, they can absorb variance from activations:</p>
+<div class="arithmatex">\[s_j = \frac{\max(|\mathbf{X}_{:, j}|)^\alpha}{\max(|\mathbf{W}_{j, :}|)^{1-\alpha}}\]</div>
+<p>where <span class="arithmatex">\(\alpha \in [0, 1]\)</span> is a hyperparameter balancing difficulty between activations and weights (<span class="arithmatex">\(\alpha = 0.5\)</span> is typical). Both activations and weights are smoothly quantized into INT8, enabling 100% INT8 matrix multiplication across all linear layers.</p>
+<hr />
+<h3 id="43-quantization-aware-fine-tuning-qlora">4.3 Quantization-Aware Fine-Tuning: QLoRA<a class="headerlink" href="#43-quantization-aware-fine-tuning-qlora" title="Permanent link">&para;</a></h3>
+<p><strong>QLoRA (Dettmers et al., 2023)</strong> enables parameter-efficient fine-tuning of multi-billion parameter models on single consumer GPUs by introducing three key innovations:</p>
+<ol>
+<li><strong>NormalFloat4 (NF4)</strong>: An information-theoretically optimal quantile quantization format for normally distributed weights, allocating discrete bins such that each bin has an equal probability mass.</li>
+<li><strong>Double Quantization (DQ)</strong>: Quantizing the quantization scale factors themselves (compressing 32-bit float scale constants to 8-bit integers), saving an additional <span class="arithmatex">\(0.37\text{ bits/parameter}\)</span>.</li>
+<li><strong>Paged Optimizers</strong>: Utilizing CUDA unified virtual memory to automatically page optimizer states between GPU VRAM and CPU RAM during gradient checkpointing spikes.</li>
+</ol>
+<hr />
+<h2 id="5-systems-and-performance-gains-memory-bandwidth-and-energy">5. Systems and Performance Gains: Memory, Bandwidth, and Energy<a class="headerlink" href="#5-systems-and-performance-gains-memory-bandwidth-and-energy" title="Permanent link">&para;</a></h2>
+<p>Quantization delivers transformative systems-level performance advantages across modern GPU architectures:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                    Impact of Quantization Across Scale                      │
+├────────────────────────────┬───────────────────────┬────────────────────────┤
+│  Model: LLaMA-3-70B        │  Static VRAM Required │  Tokens/sec Throughput │
+├────────────────────────────┼───────────────────────┼────────────────────────┤
+│  FP16 (Baseline)           │  ~140 GB (2x A100 80G)│  Baseline (1.0x)       │
+│  FP8 (E4M3)                │  ~70 GB (1x A100 80G) │  1.8x – 2.2x           │
+│  INT4 (AWQ / GPTQ)         │  ~35 GB (1x A100 80G) │  2.5x – 3.8x           │
+│  1.58-bit (BitNet b1.58)   │  ~14 GB (Consumer GPU)│  4.0x – 6.0x           │
+└────────────────────────────┴───────────────────────┴────────────────────────┘
+</code></pre>
+<h3 id="1-arithmetic-intensity-shift">1. Arithmetic Intensity Shift<a class="headerlink" href="#1-arithmetic-intensity-shift" title="Permanent link">&para;</a></h3>
+<p>During decode, the arithmetic intensity is memory bandwidth bound:
+$<span class="arithmatex">\(I = \frac{\text{Operational FLOPs}}{\text{Bytes Transferred}}\)</span>$
+Reducing weight precision from 16 bits to 4 bits cuts memory traffic by <strong><span class="arithmatex">\(4\times\)</span></strong>, effectively quadrupling the operational arithmetic intensity on the Roofline model and directly translating into a proportional decrease in Inter-Token Latency (ITL).</p>
+<h3 id="2-energy-efficiency-silicon-footprint">2. Energy Efficiency &amp; Silicon Footprint<a class="headerlink" href="#2-energy-efficiency-silicon-footprint" title="Permanent link">&para;</a></h3>
+<p>Integer arithmetic requires significantly less silicon area and electrical energy than floating-point arithmetic:
+* An <strong><span class="arithmatex">\(\text{INT8}\)</span> addition</strong> consumes <span class="arithmatex">\(\approx 0.03\text{ pJ}\)</span> compared to <span class="arithmatex">\(\approx 0.4\text{ pJ}\)</span> for <strong><span class="arithmatex">\(\text{FP16}\)</span> addition</strong> (<span class="arithmatex">\(&gt;10\times\)</span> energy reduction).
+* An <strong><span class="arithmatex">\(\text{INT8}\)</span> multiplication</strong> consumes <span class="arithmatex">\(\approx 0.2\text{ pJ}\)</span> compared to <span class="arithmatex">\(\approx 1.1\text{ pJ}\)</span> for <strong><span class="arithmatex">\(\text{FP16}\)</span> multiplication</strong>.</p>
+<hr />
+<h2 id="6-challenges-and-failure-modes-in-quantization">6. Challenges and Failure Modes in Quantization<a class="headerlink" href="#6-challenges-and-failure-modes-in-quantization" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Accuracy Degradation at <span class="arithmatex">\(&lt;3\)</span> Bits</strong>: Uniform linear quantization breaks down below 3 bits per parameter due to catastrophic representational collapse. Overcoming this requires non-linear codebooks (e.g., AQLM, QuIP#) or native 1-bit pretraining (BitNet).</li>
+<li><strong>Dequantization Kernel Overhead</strong>: In naive implementations, unpacking 4-bit integers and converting them to FP16 in CUDA kernels can introduce memory overhead that negates bandwidth savings. Production engines require hand-optimized, register-level SIMD assembly (e.g., Marlin, CUTLASS GEMM kernels).</li>
+<li><strong>KV-Cache Quantization Drift</strong>: Unlike static weights, dynamic activations in the KV cache expand over thousands of tokens. Asymmetric drift in Key vectors can cause attention score distortions unless per-channel scaling and attention sinks are preserved.</li>
+</ol>
+<hr />
+<h2 id="7-conclusion">7. Conclusion<a class="headerlink" href="#7-conclusion" title="Permanent link">&para;</a></h2>
+<p>Quantization represents one of the most foundational disciplines in deep learning systems engineering. By trading redundant floating-point precision for compact discrete representations, it resolves the fundamental memory-bandwidth wall of transformer inference.</p>
+<p>Through mathematical breakthroughs like <strong>Hessian-based compensation (GPTQ)</strong>, <strong>salient activation scaling (AWQ)</strong>, <strong>channel smoothing (SmoothQuant)</strong>, and <strong>optimal NormalFloat distributions (QLoRA)</strong>, quantization enables frontier intelligence to run with unprecedented speed, economic efficiency, and hardware portability. </p>
+<p>As silicon architectures converge around native sub-byte tensor cores (FP4, MXFP4) and zero-multiplication ternary computing (BitNet), quantization will remain the central bridge connecting theoretical AI models with scalable, real-world deployment.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+      
+        <script src="../javascripts/math.js"></script>
+      
+    
+  </body>
+</html>

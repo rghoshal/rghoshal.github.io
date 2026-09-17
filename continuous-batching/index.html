@@ -1,0 +1,918 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../agentic-ai/">
+      
+      
+        <link rel="next" href="../design-prod-grade-llm-serving-platform/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Introduction - AI Engineering Handbook</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#introduction" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="AI Engineering Handbook" class="md-header__button md-logo" aria-label="AI Engineering Handbook" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI Engineering Handbook
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Introduction
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AI Engineering Handbook" class="md-nav__button md-logo" aria-label="AI Engineering Handbook" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI Engineering Handbook
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Engineering Handbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agentic-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-problem-static-batching-and-gpu-underutilization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Problem: Static Batching and GPU Underutilization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-solution-continuous-batching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Solution: Continuous Batching
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-optimization-techniques-in-continuous-batching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Optimization Techniques in Continuous Batching
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmarking-and-performance-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benchmarking and Performance Evaluation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#popular-implementations-and-frameworks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Popular Implementations and Frameworks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-challenges-and-limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Challenges and Limitations
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../design-prod-grade-llm-serving-platform/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Standard Engineering Blueprint: Designing and Implementing a Production-Grade Enterprise LLM Serving Platform
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flash-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../future-of-llm-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Future of LLM Inference: From Hardware-Software Co-Design to Evolutionary Industrial Intelligence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../inside-llm-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inside an LLM Inference Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Mechanics, Mathematics, and Hardware Architecture of Key-Value (KV) Caching in Large Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Mathematics, Algorithms, and Hardware Mechanics of LLM Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rlhf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforcement Learning from Human Feedback (RLHF): Aligning Large Language Models for Precision, Safety, and Reasoning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../seq-2-seq-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inside an LLM Inference Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tokenization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Mechanics and Industrial Economics of Tokenization in Large Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vector-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vector Databases and High-Performance Retrieval-Augmented Generation (RAG): Architecture, Indexing Algorithms, and Comparative Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vllm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    vLLM: High-Throughput, Memory-Efficient LLM Serving — Technical, Architectural, Commercial, and Product Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-problem-static-batching-and-gpu-underutilization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Problem: Static Batching and GPU Underutilization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-solution-continuous-batching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Solution: Continuous Batching
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-optimization-techniques-in-continuous-batching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Optimization Techniques in Continuous Batching
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmarking-and-performance-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benchmarking and Performance Evaluation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#popular-implementations-and-frameworks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Popular Implementations and Frameworks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-challenges-and-limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Challenges and Limitations
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h1>
+<p>In its quest to generate the next "best" token, Large Language Models (LLMs) face a significant challenge: the inference latency can be substantial, especially when generating long sequences of text. This is because the model has to perform a forward pass through the entire network for each token it generates. While this approach is simple and effective for short sequences, it becomes prohibitively expensive for long sequences. To address this, researchers have developed various optimization techniques, one of which is continuous batching.</p>
+<h2 id="the-problem-static-batching-and-gpu-underutilization">The Problem: Static Batching and GPU Underutilization<a class="headerlink" href="#the-problem-static-batching-and-gpu-underutilization" title="Permanent link">&para;</a></h2>
+<p>Static batching is the traditional approach to LLM inference. In static batching, a fixed number of requests are grouped together to form a batch. The model processes the entire batch in a single forward pass. The size of the batch is fixed and cannot be changed during inference. This approach is simple and effective for short sequences, but it becomes prohibitively expensive for long sequences. The reason for this is that the model has to perform a forward pass through the entire network for each token it generates. While this approach is simple and effective for short sequences, it becomes prohibitively expensive for long sequences. To address this, researchers have developed various optimization techniques, one of which is continuous batching.</p>
+<p>One of the impacts of statis batching is inefficient or sub-optimized GPU memory utilization. This is because the memory required for each request is determined by the length of the input prompt plus the number of tokens to be generated. However, since the batch size is fixed, the memory required for the batch is determined by the longest sequence in the batch. This means that if the requests in the batch have different lengths, the memory required for the batch will be determined by the longest sequence in the batch. This can lead to a situation where the GPU is not being used to its full potential, as the memory required for the batch is determined by the longest sequence in the batch, even if the other requests in the batch have shorter lengths. This can lead to a situation where the GPU is not being used to its full potential, leading to unintended throttling of the request streams that throng the transformer pipeline looking for next generation sequence.</p>
+<h2 id="the-solution-continuous-batching">The Solution: Continuous Batching<a class="headerlink" href="#the-solution-continuous-batching" title="Permanent link">&para;</a></h2>
+<p>As a solution to the problem mentioned above , a family of algorithms have been designed that allows requests to be processed in a flexible, dynamic manner rather than in rigid, fixed-size batches. In this approach , different requests can have different lengths , and the batch size can change dynamically during inference. This is achieved by keeping track of the memory usage of each request and adjusting the batch size accordingly. The actual memory usage during inference is determined by the sum of the memory usage of all the requests in the batch. As each request generates a new token, the memory usage of that request increases. The batch size is adjusted dynamically to ensure that the total memory usage does not exceed the available memory. This allows the GPU to be used more efficiently, as the memory is not being wasted on requests that are not being processed. In addition to improved memory utilization , continuous batching also allows for lower latency and higher throughput , as the requests are processed in a more efficient manner. </p>
+<h2 id="key-optimization-techniques-in-continuous-batching">Key Optimization Techniques in Continuous Batching<a class="headerlink" href="#key-optimization-techniques-in-continuous-batching" title="Permanent link">&para;</a></h2>
+<p>Continuous batching , while conceptually simple , relies on a few key optimization techniques to achieve its performance benefits. These techniques work together to allow for dynamic batch sizing and efficient memory utilization. Some of the key optimization techniques in continuous batching include :</p>
+<ol>
+<li>
+<p><strong>Padding-Free Attention</strong>: In traditional static batching , requests are padded to the length of the longest sequence in the batch. This means that even if a request has a short sequence , it will still occupy memory and computational resources as if it were a long sequence. Padding-free attention eliminates this waste by allowing each request to be processed independently of the other requests in the batch. This is achieved by using a sparse attention mechanism that only attends to the relevant tokens in the sequence. As a result , the memory and computational resources required for each request are determined by the actual length of the sequence , rather than the length of the longest sequence in the batch. </p>
+</li>
+<li>
+<p><strong>Dynamic Batch Sizing</strong>: Continuous batching allows the batch size to change dynamically during inference. This is achieved by keeping track of the memory usage of each request and adjusting the batch size accordingly. As each request generates a new token, the memory usage of that request increases. The batch size is adjusted dynamically to ensure that the total memory usage does not exceed the available memory. This allows the GPU to be used more efficiently, as the memory is not being wasted on requests that are not being processed. In addition to improved memory utilization , continuous batching also allows for lower latency and higher throughput , as the requests are processed in a more efficient manner. </p>
+</li>
+<li>
+<p><strong>Prefill and Decode</strong>: Continuous batching often involves a two-phase approach to processing requests. In the first phase , called prefill , the input prompts of all the requests in the batch are processed in parallel. This is done to generate the initial key-value (KV) cache for each request. In the second phase , called decode , the requests are processed one token at a time. This is done to generate the output sequences for each request. The two-phase approach allows for efficient use of the GPU, as the prefill phase can be parallelized across all the requests in the batch, while the decode phase can be optimized for single-token generation. </p>
+</li>
+<li>
+<p><strong>Speculative Decoding</strong>: Speculative decoding is an optimization technique that can be used to further improve the performance of continuous batching. In speculative decoding , a smaller, faster draft model is used to generate a few candidate tokens in parallel with the main model. These candidate tokens are then verified by the main model in a single forward pass. If the candidate tokens are correct , they are accepted as the output. If the candidate tokens are incorrect , they are discarded and the main model generates the correct tokens. Speculative decoding can significantly reduce the latency and improve the throughput of continuous batching. </p>
+</li>
+</ol>
+<h2 id="benchmarking-and-performance-evaluation">Benchmarking and Performance Evaluation<a class="headerlink" href="#benchmarking-and-performance-evaluation" title="Permanent link">&para;</a></h2>
+<p>To evaluate the performance of continuous batching , it is essential to have a comprehensive benchmarking framework that can measure the key performance indicators (KPIs). These KPIs help in understanding the efficiency of the system under different load conditions. The most important KPIs for evaluating continuous batching include :</p>
+<ol>
+<li>
+<p><strong>Throughput</strong>: This is the measure of the number of requests that can be processed by the system in a given time period. A higher throughput indicates better system performance. In the context of continuous batching , throughput is often measured in tokens per second (TPS) or requests per second (RPS). A good continuous batching system should be able to achieve high throughput even under heavy load.</p>
+</li>
+<li>
+<p><strong>Latency</strong>: This is the measure of the time it takes for a single request to be processed by the system. Latency is often measured in milliseconds (ms). A lower latency indicates better system performance. In the context of continuous batching , latency is often measured as the time it takes to generate the first token (time-to-first-token) or the time it takes to generate all the tokens (time-to-completion). A good continuous batching system should be able to achieve low latency even under heavy load.</p>
+</li>
+<li>
+<p><strong>Memory Efficiency</strong>: This is the measure of how efficiently the system uses the available memory. Memory efficiency is often measured as the percentage of memory that is used by the system. A higher memory efficiency indicates better system performance. In the context of continuous batching , memory efficiency is often measured as the percentage of memory that is used by the active requests. A good continuous batching system should be able to achieve high memory efficiency even under heavy load.</p>
+</li>
+</ol>
+<h2 id="popular-implementations-and-frameworks">Popular Implementations and Frameworks<a class="headerlink" href="#popular-implementations-and-frameworks" title="Permanent link">&para;</a></h2>
+<p>Several open-source frameworks and libraries have been developed to implement continuous batching. These frameworks provide optimized implementations of the key optimization techniques discussed above, making it easier for developers to deploy and use continuous batching. Some of the popular implementations include :</p>
+<ol>
+<li>
+<p><strong>vLLM</strong>: vLLM is a high-throughput and memory-efficient LLM inference engine that supports continuous batching. It uses PagedAttention, an algorithm that manages memory more efficiently, and implements continuous batching to maximize GPU utilization. vLLM has become a popular choice for deploying LLMs due to its ease of use and excellent performance.</p>
+</li>
+<li>
+<p><strong>TensorRT-LLM</strong>: TensorRT-LLM is an open-source library from NVIDIA that is designed for high-performance LLM inference. It supports continuous batching and incorporates various optimizations like quantization and kernel fusion to maximize throughput and minimize latency. It is tightly integrated with NVIDIA's TensorRT ecosystem, providing a robust platform for large-scale deployments.</p>
+</li>
+<li>
+<p><strong>DeepSpeed-MII</strong>: DeepSpeed-MII (Model Inference and Inference) is part of Microsoft's DeepSpeed optimization library. It is built on top of DeepSpeed's inference optimizations and supports continuous batching. It also incorporates DeepSpeed's features like quantization and ZeRO (Zero Redundancy Optimizer) to further enhance performance. </p>
+</li>
+<li>
+<p><strong>Hugging Face Text Generation Inference (TGI)</strong>: TGI is a production-ready inference server for transformer models from Hugging Face. It supports continuous batching and includes features like token streaming and quantization to optimize performance. TGI is widely used for deploying Hugging Face models in production environments.</p>
+</li>
+</ol>
+<h2 id="common-challenges-and-limitations">Common Challenges and Limitations<a class="headerlink" href="#common-challenges-and-limitations" title="Permanent link">&para;</a></h2>
+<p>While continuous batching offers significant benefits, it also comes with certain challenges and limitations that need to be considered. These challenges can impact the performance of the system and need to be addressed during deployment. Some of the common challenges include :</p>
+<ol>
+<li>
+<p><strong>Complexity</strong>: Continuous batching is more complex to implement than traditional static batching. It requires careful management of memory and computation resources, as well as the implementation of various optimization techniques. This complexity can make it challenging to deploy and maintain continuous batching systems, especially for smaller teams or organizations. </p>
+</li>
+<li>
+<p><strong>Memory Overhead</strong>: While continuous batching improves memory efficiency compared to static batching, it still requires significant memory resources. The KV cache, which stores the intermediate activations of the model, can consume a large amount of memory, especially for long sequences. This can be a limitation for deployments with limited memory resources.</p>
+</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+      
+        <script src="../javascripts/math.js"></script>
+      
+    
+  </body>
+</html>

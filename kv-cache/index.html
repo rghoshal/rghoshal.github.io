@@ -1,0 +1,1655 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../inside-llm-inference/">
+      
+      
+        <link rel="next" href="../llm-quantization/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>The Mechanics, Mathematics, and Hardware Architecture of Key-Value (KV) Caching in Large Language Models - AI Engineering Handbook</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#the-mechanics-mathematics-and-hardware-architecture-of-key-value-kv-caching-in-large-language-models" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="AI Engineering Handbook" class="md-header__button md-logo" aria-label="AI Engineering Handbook" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI Engineering Handbook
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              The Mechanics, Mathematics, and Hardware Architecture of Key-Value (KV) Caching in Large Language Models
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AI Engineering Handbook" class="md-nav__button md-logo" aria-label="AI Engineering Handbook" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI Engineering Handbook
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Engineering Handbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agentic-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../continuous-batching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../design-prod-grade-llm-serving-platform/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Standard Engineering Blueprint: Designing and Implementing a Production-Grade Enterprise LLM Serving Platform
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flash-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../future-of-llm-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Future of LLM Inference: From Hardware-Software Co-Design to Evolutionary Industrial Intelligence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../inside-llm-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inside an LLM Inference Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Mechanics, Mathematics, and Hardware Architecture of Key-Value (KV) Caching in Large Language Models
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Mechanics, Mathematics, and Hardware Architecture of Key-Value (KV) Caching in Large Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-problem-the-computational-inefficiency-of-naive-autoregression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The Problem: The Computational Inefficiency of Naive Autoregression
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. The Problem: The Computational Inefficiency of Naive Autoregression">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-standard-attention-mechanism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Standard Attention Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-inefficiency-of-the-naive-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Inefficiency of the Naive Approach
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-how-the-kv-cache-solves-the-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. How the KV Cache Solves the Problem
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. How the KV Cache Solves the Problem">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mathematical-formulation-of-cached-step-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mathematical Formulation of Cached Step Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complexity-reduction-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complexity Reduction Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-architectural-variants-and-kv-cache-footprints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Architectural Variants and KV Cache Footprints
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Architectural Variants and KV Cache Footprints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-multi-head-attention-mha" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Multi-Head Attention (MHA)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-multi-query-attention-mqa-shazeer-2019" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Multi-Query Attention (MQA - Shazeer, 2019)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-grouped-query-attention-gqa-ainslie-et-al-2023" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Grouped-Query Attention (GQA - Ainslie et al., 2023)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-multi-head-latent-attention-mla-deepseek-v2-deepseek-v3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Multi-Head Latent Attention (MLA - DeepSeek-V2 / DeepSeek-V3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-mathematical-sizing-memory-architecture-and-hardwaresoftware-abstraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Mathematical Sizing, Memory Architecture, and Hardware/Software Abstraction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Mathematical Sizing, Memory Architecture, and Hardware/Software Abstraction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-exact-sizing-formula-and-worked-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Exact Sizing Formula and Worked Example
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.1 Exact Sizing Formula and Worked Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#concrete-industrial-example-llama-3-70b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concrete Industrial Example: LLaMA-3-70B
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-gpu-memory-hierarchy-and-memory-bandwidth-wall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 GPU Memory Hierarchy and Memory Bandwidth Wall
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.2 GPU Memory Hierarchy and Memory Bandwidth Wall">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#roofline-model-the-memory-bandwidth-bottleneck" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Roofline Model &amp; The Memory Bandwidth Bottleneck
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-software-abstraction-pagedattention-and-virtual-memory-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Software Abstraction: PagedAttention and Virtual Memory Management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.3 Software Abstraction: PagedAttention and Virtual Memory Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mathematical-block-paging-mechanics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mathematical Block Paging Mechanics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-active-research-frontiers-in-kv-cache-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Active Research Frontiers in KV Cache Optimization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Active Research Frontiers in KV Cache Optimization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-low-bit-quantization-fp8-int4-int2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Low-Bit Quantization (FP8, INT4, INT2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-context-eviction-dynamic-token-dropping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Context Eviction &amp; Dynamic Token Dropping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-disaggregated-kv-fabrics-and-remote-rdma-paging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Disaggregated KV Fabrics and Remote RDMA Paging
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Conclusion
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Mathematics, Algorithms, and Hardware Mechanics of LLM Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rlhf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforcement Learning from Human Feedback (RLHF): Aligning Large Language Models for Precision, Safety, and Reasoning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../seq-2-seq-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inside an LLM Inference Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tokenization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Mechanics and Industrial Economics of Tokenization in Large Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vector-database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vector Databases and High-Performance Retrieval-Augmented Generation (RAG): Architecture, Indexing Algorithms, and Comparative Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vllm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    vLLM: High-Throughput, Memory-Efficient LLM Serving — Technical, Architectural, Commercial, and Product Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-problem-the-computational-inefficiency-of-naive-autoregression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The Problem: The Computational Inefficiency of Naive Autoregression
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. The Problem: The Computational Inefficiency of Naive Autoregression">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-standard-attention-mechanism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Standard Attention Mechanism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-inefficiency-of-the-naive-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Inefficiency of the Naive Approach
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-how-the-kv-cache-solves-the-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. How the KV Cache Solves the Problem
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. How the KV Cache Solves the Problem">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mathematical-formulation-of-cached-step-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mathematical Formulation of Cached Step Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complexity-reduction-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complexity Reduction Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-architectural-variants-and-kv-cache-footprints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Architectural Variants and KV Cache Footprints
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Architectural Variants and KV Cache Footprints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-multi-head-attention-mha" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Multi-Head Attention (MHA)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-multi-query-attention-mqa-shazeer-2019" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Multi-Query Attention (MQA - Shazeer, 2019)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-grouped-query-attention-gqa-ainslie-et-al-2023" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Grouped-Query Attention (GQA - Ainslie et al., 2023)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-multi-head-latent-attention-mla-deepseek-v2-deepseek-v3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Multi-Head Latent Attention (MLA - DeepSeek-V2 / DeepSeek-V3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-mathematical-sizing-memory-architecture-and-hardwaresoftware-abstraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Mathematical Sizing, Memory Architecture, and Hardware/Software Abstraction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Mathematical Sizing, Memory Architecture, and Hardware/Software Abstraction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-exact-sizing-formula-and-worked-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Exact Sizing Formula and Worked Example
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.1 Exact Sizing Formula and Worked Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#concrete-industrial-example-llama-3-70b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concrete Industrial Example: LLaMA-3-70B
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-gpu-memory-hierarchy-and-memory-bandwidth-wall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 GPU Memory Hierarchy and Memory Bandwidth Wall
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.2 GPU Memory Hierarchy and Memory Bandwidth Wall">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#roofline-model-the-memory-bandwidth-bottleneck" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Roofline Model &amp; The Memory Bandwidth Bottleneck
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-software-abstraction-pagedattention-and-virtual-memory-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Software Abstraction: PagedAttention and Virtual Memory Management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.3 Software Abstraction: PagedAttention and Virtual Memory Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mathematical-block-paging-mechanics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mathematical Block Paging Mechanics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-active-research-frontiers-in-kv-cache-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Active Research Frontiers in KV Cache Optimization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Active Research Frontiers in KV Cache Optimization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-low-bit-quantization-fp8-int4-int2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Low-Bit Quantization (FP8, INT4, INT2)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-context-eviction-dynamic-token-dropping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Context Eviction &amp; Dynamic Token Dropping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-disaggregated-kv-fabrics-and-remote-rdma-paging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Disaggregated KV Fabrics and Remote RDMA Paging
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Conclusion
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="the-mechanics-mathematics-and-hardware-architecture-of-key-value-kv-caching-in-large-language-models">The Mechanics, Mathematics, and Hardware Architecture of Key-Value (KV) Caching in Large Language Models<a class="headerlink" href="#the-mechanics-mathematics-and-hardware-architecture-of-key-value-kv-caching-in-large-language-models" title="Permanent link">&para;</a></h1>
+<hr />
+<h2 id="1-introduction">1. Introduction<a class="headerlink" href="#1-introduction" title="Permanent link">&para;</a></h2>
+<p>In modern Large Language Model (LLM) serving systems, the <strong>Key-Value (KV) Cache</strong> stands as one of the most critical algorithmic and systems-level optimizations enabling practical autoregressive inference. </p>
+<p>Autoregressive transformer decoders generate sequences token-by-token. In a naive execution model, computing each subsequent token requires re-evaluating the entire sequence history through all transformer layers, resulting in cubic cumulative computational complexity (<span class="arithmatex">\(O(N^3)\)</span>) and severe latency degradation.</p>
+<p>The KV cache eliminates redundant mathematical operations by persisting the intermediate <strong>Key (<span class="arithmatex">\(\mathbf{K}\)</span>)</strong> and <strong>Value (<span class="arithmatex">\(\mathbf{V}\)</span>)</strong> activation projections of previously processed tokens within accelerator memory (High Bandwidth Memory - HBM). While conceptually straightforward—trading memory capacity for computational time—the implementation, memory management, and hardware orchestration of the KV cache represent some of the most intricate engineering challenges in deep learning systems.</p>
+<p>This article provides a rigorous mathematical derivation of KV caching, analyzes its implementation across modern attention variants (MHA, MQA, GQA, MLA), examines the underlying GPU memory hierarchy and hardware abstractions (from CUDA kernels to PagedAttention virtual memory), and explores the active research frontiers driving KV cache optimization.</p>
+<hr />
+<h2 id="2-the-problem-the-computational-inefficiency-of-naive-autoregression">2. The Problem: The Computational Inefficiency of Naive Autoregression<a class="headerlink" href="#2-the-problem-the-computational-inefficiency-of-naive-autoregression" title="Permanent link">&para;</a></h2>
+<p>To understand the necessity of the KV cache, consider an autoregressive decoder generating text given an initial prompt of length <span class="arithmatex">\(S\)</span>. At generation step <span class="arithmatex">\(t\)</span> (where the current sequence length is <span class="arithmatex">\(t\)</span>, with <span class="arithmatex">\(t \ge S\)</span>), the model must compute the probability distribution for token <span class="arithmatex">\(x_{t+1}\)</span>.</p>
+<h3 id="the-standard-attention-mechanism">The Standard Attention Mechanism<a class="headerlink" href="#the-standard-attention-mechanism" title="Permanent link">&para;</a></h3>
+<p>For an input sequence matrix <span class="arithmatex">\(\mathbf{X} \in \mathbb{R}^{t \times d_{\text{model}}}\)</span>, a multi-head attention layer with <span class="arithmatex">\(H\)</span> heads and head dimension <span class="arithmatex">\(d_k = d_{\text{model}} / H\)</span> computes linear projections via learned weight matrices <span class="arithmatex">\(\mathbf{W}_Q, \mathbf{W}_K, \mathbf{W}_V \in \mathbb{R}^{d_{\text{model}} \times d_k}\)</span>:</p>
+<div class="arithmatex">\[\mathbf{Q} = \mathbf{X} \mathbf{W}_Q \in \mathbb{R}^{t \times d_k}\]</div>
+<div class="arithmatex">\[\mathbf{K} = \mathbf{X} \mathbf{W}_K \in \mathbb{R}^{t \times d_k}\]</div>
+<div class="arithmatex">\[\mathbf{V} = \mathbf{X} \mathbf{W}_V \in \mathbb{R}^{t \times d_k}\]</div>
+<p>The scaled dot-product attention is calculated as:</p>
+<div class="arithmatex">\[\mathbf{S} = \frac{\mathbf{Q} \mathbf{K}^T}{\sqrt{d_k}} \in \mathbb{R}^{t \times t}\]</div>
+<div class="arithmatex">\[\mathbf{A} = \text{softmax}(\mathbf{S} + \mathbf{M}) \in \mathbb{R}^{t \times t}\]</div>
+<div class="arithmatex">\[\mathbf{O} = \mathbf{A} \mathbf{V} \in \mathbb{R}^{t \times d_k}\]</div>
+<p>where <span class="arithmatex">\(\mathbf{M} \in \mathbb{R}^{t \times t}\)</span> is the causal attention mask:</p>
+<div class="arithmatex">\[M_{i, j} = \begin{cases} 0 &amp; \text{if } i \ge j \\ -\infty &amp; \text{if } i &lt; j \end{cases}\]</div>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│             Naive Autoregressive Generation (Without KV Cache)              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Step t=1:  [x1]             ──► Forward Pass (Compute Q1, K1, V1) ──► y1   │
+│  Step t=2:  [x1, x2]         ──► Forward Pass (Recompute K1, V1 + K2, V2)   │
+│  Step t=3:  [x1, x2, x3]     ──► Forward Pass (Recompute K1..2, V1..2 + K3) │
+│  ...                                                                        │
+│  Step t=N:  [x1, x2, ... xN] ──► Forward Pass (Recompute ALL K1..N, V1..N)  │
+│                                                                             │
+│  Cumulative Complexity: O(N^3 * d) operations — Massive Redundant FLOPs!    │
+└─────────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="the-inefficiency-of-the-naive-approach">The Inefficiency of the Naive Approach<a class="headerlink" href="#the-inefficiency-of-the-naive-approach" title="Permanent link">&para;</a></h3>
+<p>In the naive approach without caching:
+1. <strong>Redundant Linear Projections</strong>: The rows <span class="arithmatex">\(\mathbf{x}_1, \dots, \mathbf{x}_{t-1}\)</span> have already been multiplied by <span class="arithmatex">\(\mathbf{W}_K\)</span> and <span class="arithmatex">\(\mathbf{W}_V\)</span> in preceding steps <span class="arithmatex">\(1, \dots, t-1\)</span>. Because the model weights <span class="arithmatex">\(\mathbf{W}_K, \mathbf{W}_V\)</span> and historical tokens <span class="arithmatex">\(\mathbf{x}_{1:t-1}\)</span> are static and invariant to future tokens (due to the causal mask), recomputing <span class="arithmatex">\(\mathbf{K}_{1:t-1}\)</span> and <span class="arithmatex">\(\mathbf{V}_{1:t-1}\)</span> produces identical matrices at every step.
+2. <strong>Computational Complexity Explosion</strong>:
+   * At step <span class="arithmatex">\(t\)</span>, computing <span class="arithmatex">\(\mathbf{X} \mathbf{W}_K\)</span> and <span class="arithmatex">\(\mathbf{X} \mathbf{W}_V\)</span> takes <span class="arithmatex">\(O(t \cdot d_{\text{model}} \cdot d_k)\)</span> FLOPs per head.
+   * Summing across the generation of <span class="arithmatex">\(N\)</span> tokens:
+     $<span class="arithmatex">\(\text{Total Projection FLOPs} = \sum_{t=1}^{N} O(t \cdot d_{\text{model}}^2) = O(N^2 \cdot d_{\text{model}}^2)\)</span>$
+   * Computing full attention <span class="arithmatex">\(\mathbf{Q} \mathbf{K}^T\)</span> at step <span class="arithmatex">\(t\)</span> takes <span class="arithmatex">\(O(t^2 \cdot d_k)\)</span>. Summing over <span class="arithmatex">\(N\)</span> steps:
+     $<span class="arithmatex">\(\text{Total Attention FLOPs} = \sum_{t=1}^{N} O(t^2 \cdot d_k) = O(N^3 \cdot d_k)\)</span>$
+   This cubic scaling makes generating long sequences computationally intractable.</p>
+<hr />
+<h2 id="3-how-the-kv-cache-solves-the-problem">3. How the KV Cache Solves the Problem<a class="headerlink" href="#3-how-the-kv-cache-solves-the-problem" title="Permanent link">&para;</a></h2>
+<p>The foundational insight of the KV cache is that <strong>only the Query vector for the newest token (<span class="arithmatex">\(\mathbf{q}_t\)</span>) needs to be computed at step <span class="arithmatex">\(t\)</span></strong>, while the Key and Value vectors for all past tokens can be saved in memory.</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                 KV-Cached Generation Step (Step t)                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  New Token:  x_t  ──► Linear Projections ──► q_t, k_t, v_t                  │
+│                                               │    │                        │
+│                                               │    ▼                        │
+│                                               │  ┌───────────────────────┐  │
+│                                               │  │  Append to KV Cache   │  │
+│                                               │  │  K_past ◄── [k_t]     │  │
+│                                               │  │  V_past ◄── [v_t]     │  │
+│                                               │  └───────────┬───────────┘  │
+│                                               ▼              │              │
+│       Attention Score:  s_t = (q_t @ [K_past, k_t]^T) / sqrt(d_k)           │
+│                         a_t = softmax(s_t)                                  │
+│                         o_t = a_t @ [V_past, v_t]                           │
+│                                                                             │
+│  Computational Complexity per step: O(t * d)  ──► Cumulative: O(N^2 * d)    │
+└─────────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="mathematical-formulation-of-cached-step-generation">Mathematical Formulation of Cached Step Generation<a class="headerlink" href="#mathematical-formulation-of-cached-step-generation" title="Permanent link">&para;</a></h3>
+<p>At decoding step <span class="arithmatex">\(t\)</span>:
+1. <strong>Compute projections only for the current token <span class="arithmatex">\(\mathbf{x}_t \in \mathbb{R}^{1 \times d_{\text{model}}}\)</span></strong>:
+   $<span class="arithmatex">\(\mathbf{q}_t = \mathbf{x}_t \mathbf{W}_Q \in \mathbb{R}^{1 \times d_k}\)</span>$
+   $<span class="arithmatex">\(\mathbf{k}_t = \mathbf{x}_t \mathbf{W}_K \in \mathbb{R}^{1 \times d_k}\)</span>$
+   $<span class="arithmatex">\(\mathbf{v}_t = \mathbf{x}_t \mathbf{W}_V \in \mathbb{R}^{1 \times d_k}\)</span>$</p>
+<ol>
+<li>
+<p><strong>Update the KV Cache in memory</strong>:
+   $<span class="arithmatex">\(\mathbf{K}_{\le t} = \begin{bmatrix} \mathbf{K}_{&lt; t} \\ \mathbf{k}_t \end{bmatrix} \in \mathbb{R}^{t \times d_k}\)</span>$
+   $<span class="arithmatex">\(\mathbf{V}_{\le t} = \begin{bmatrix} \mathbf{V}_{&lt; t} \\ \mathbf{v}_t \end{bmatrix} \in \mathbb{R}^{t \times d_k}\)</span>$</p>
+</li>
+<li>
+<p><strong>Compute single-row attention against the entire cached history</strong>:
+   $<span class="arithmatex">\(\mathbf{s}_t = \frac{\mathbf{q}_t \mathbf{K}_{\le t}^T}{\sqrt{d_k}} \in \mathbb{R}^{1 \times t}\)</span>$
+   $<span class="arithmatex">\(\mathbf{a}_t = \text{softmax}(\mathbf{s}_t) \in \mathbb{R}^{1 \times t}\)</span>$
+   $<span class="arithmatex">\(\mathbf{o}_t = \mathbf{a}_t \mathbf{V}_{\le t} \in \mathbb{R}^{1 \times d_k}\)</span>$</p>
+</li>
+<li>
+<p><strong>Project to output dimension</strong>:
+   $<span class="arithmatex">\(\mathbf{u}_t = \mathbf{o}_t \mathbf{W}_O \in \mathbb{R}^{1 \times d_{\text{model}}}\)</span>$</p>
+</li>
+</ol>
+<h3 id="complexity-reduction-analysis">Complexity Reduction Analysis<a class="headerlink" href="#complexity-reduction-analysis" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Operation Stage</th>
+<th style="text-align: left;">Naive (No Cache) Step <span class="arithmatex">\(t\)</span></th>
+<th style="text-align: left;">Naive Cumulative (<span class="arithmatex">\(1 \dots N\)</span>)</th>
+<th style="text-align: left;">KV-Cached Step <span class="arithmatex">\(t\)</span></th>
+<th style="text-align: left;">KV-Cached Cumulative (<span class="arithmatex">\(1 \dots N\)</span>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Q, K, V Projections</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(O(t \cdot d_{\text{model}}^2)\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(O(N^2 \cdot d_{\text{model}}^2)\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(O(1 \cdot d_{\text{model}}^2)\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(O(N \cdot d_{\text{model}}^2)\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Score Matmul (<span class="arithmatex">\(\mathbf{Q}\mathbf{K}^T\)</span>)</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(O(t^2 \cdot d_k)\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(O(N^3 \cdot d_k)\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(O(t \cdot d_k)\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(O(N^2 \cdot d_k)\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Value Matmul (<span class="arithmatex">\(\mathbf{A}\mathbf{V}\)</span>)</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(O(t^2 \cdot d_k)\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(O(N^3 \cdot d_k)\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(O(t \cdot d_k)\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(O(N^2 \cdot d_k)\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Total Algorithmic Complexity</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(O(t^2)\)</span></td>
+<td style="text-align: left;"><strong><span class="arithmatex">\(O(N^3)\)</span></strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(O(t)\)</span></td>
+<td style="text-align: left;"><strong><span class="arithmatex">\(O(N^2)\)</span></strong></td>
+</tr>
+</tbody>
+</table>
+<p>The KV cache successfully transforms the cumulative computational complexity of sequence generation from <strong>cubic <span class="arithmatex">\(O(N^3)\)</span> to quadratic <span class="arithmatex">\(O(N^2)\)</span></strong>.</p>
+<hr />
+<h2 id="4-architectural-variants-and-kv-cache-footprints">4. Architectural Variants and KV Cache Footprints<a class="headerlink" href="#4-architectural-variants-and-kv-cache-footprints" title="Permanent link">&para;</a></h2>
+<p>While the KV cache saves massive compute, it introduces a substantial <strong>memory capacity bottleneck</strong>. Over time, different attention architectures have evolved specifically to compress the dimensional footprint of the KV cache.</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                    KV Cache Architecture Comparison                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Multi-Head Attention (MHA):                                                │
+│  Q-Heads: [ Q1 ] [ Q2 ] [ Q3 ] [ Q4 ] [ Q5 ] [ Q6 ] [ Q7 ] [ Q8 ]           │
+│  K-Heads: [ K1 ] [ K2 ] [ K3 ] [ K4 ] [ K5 ] [ K6 ] [ K7 ] [ K8 ] (1:1)    │
+│  V-Heads: [ V1 ] [ V2 ] [ V3 ] [ V4 ] [ V5 ] [ V6 ] [ V7 ] [ V8 ] (1:1)    │
+│                                                                             │
+│  Multi-Query Attention (MQA):                                               │
+│  Q-Heads: [ Q1 ] [ Q2 ] [ Q3 ] [ Q4 ] [ Q5 ] [ Q6 ] [ Q7 ] [ Q8 ]           │
+│  K-Heads: [                     K1 (Shared)                     ] (8:1)     │
+│  V-Heads: [                     V1 (Shared)                     ] (8:1)     │
+│                                                                             │
+│  Grouped-Query Attention (GQA):                                             │
+│  Q-Heads: [ Q1   Q2 ]  [ Q3   Q4 ]  [ Q5   Q6 ]  [ Q7   Q8 ]                │
+│  K-Heads: [   K1    ]  [   K2    ]  [   K3    ]  [   K4    ]        (2:1)     │
+│  V-Heads: [   V1    ]  [   V2    ]  [   V3    ]  [   V4    ]        (2:1)     │
+│                                                                             │
+│  Multi-Head Latent Attention (MLA - DeepSeek):                              │
+│  Compressed Latent: [ c_KV (Low-Rank Vector) ] + [ Decoupled RoPE Key k_R ] │
+└─────────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="1-multi-head-attention-mha">1. Multi-Head Attention (MHA)<a class="headerlink" href="#1-multi-head-attention-mha" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Design</strong>: Number of Query heads <span class="arithmatex">\(H_Q\)</span> equals the number of Key/Value heads <span class="arithmatex">\(H_{KV}\)</span> (<span class="arithmatex">\(H_Q = H_{KV} = H\)</span>).</li>
+<li><strong>Memory Footprint per token</strong>:
+  $<span class="arithmatex">\(\text{Bytes/Token}_{\text{MHA}} = 2 \times n_{\text{layers}} \times H \times d_k \times P_{\text{bytes}}\)</span>$
+  where <span class="arithmatex">\(P_{\text{bytes}}\)</span> is the precision byte width (e.g., 2 for FP16/BF16, 1 for FP8).</li>
+<li><strong>Models</strong>: GPT-3, Original Transformer, LLaMA-1.</li>
+</ul>
+<h3 id="2-multi-query-attention-mqa-shazeer-2019">2. Multi-Query Attention (MQA - Shazeer, 2019)<a class="headerlink" href="#2-multi-query-attention-mqa-shazeer-2019" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Design</strong>: A single Key head and a single Value head are shared across all <span class="arithmatex">\(H_Q\)</span> Query heads (<span class="arithmatex">\(H_{KV} = 1\)</span>).</li>
+<li><strong>Memory Footprint per token</strong>:
+  $<span class="arithmatex">\(\text{Bytes/Token}_{\text{MQA}} = 2 \times n_{\text{layers}} \times 1 \times d_k \times P_{\text{bytes}} = \frac{1}{H_Q} \times \text{Bytes/Token}_{\text{MHA}}\)</span>$</li>
+<li><strong>Impact</strong>: Reduces KV-cache memory by a factor of <span class="arithmatex">\(H_Q\)</span> (typically <span class="arithmatex">\(32\times\)</span> to <span class="arithmatex">\(64\times\)</span>).</li>
+<li><strong>Models</strong>: Falcon-7B, PaLM, StarCoder.</li>
+</ul>
+<h3 id="3-grouped-query-attention-gqa-ainslie-et-al-2023">3. Grouped-Query Attention (GQA - Ainslie et al., 2023)<a class="headerlink" href="#3-grouped-query-attention-gqa-ainslie-et-al-2023" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Design</strong>: Query heads are divided into <span class="arithmatex">\(G\)</span> groups, with each group sharing one Key and one Value head (<span class="arithmatex">\(H_{KV} = G\)</span>, where <span class="arithmatex">\(1 &lt; G &lt; H_Q\)</span>).</li>
+<li><strong>Memory Footprint per token</strong>:
+  $<span class="arithmatex">\(\text{Bytes/Token}_{\text{GQA}} = 2 \times n_{\text{layers}} \times G \times d_k \times P_{\text{bytes}}\)</span>$</li>
+<li><strong>Impact</strong>: Recovers the model quality and representational capacity of MHA while delivering up to an <span class="arithmatex">\(8\times\)</span> memory reduction compared to MHA.</li>
+<li><strong>Models</strong>: LLaMA-2-70B, LLaMA-3 (all variants), Mistral-7B, Mixtral 8x7B.</li>
+</ul>
+<h3 id="4-multi-head-latent-attention-mla-deepseek-v2-deepseek-v3">4. Multi-Head Latent Attention (MLA - DeepSeek-V2 / DeepSeek-V3)<a class="headerlink" href="#4-multi-head-latent-attention-mla-deepseek-v2-deepseek-v3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Design</strong>: Instead of caching full uncompressed Key and Value projections, the Key and Value matrices are projected into a low-rank compressed latent vector <span class="arithmatex">\(\mathbf{c}_t^{KV} \in \mathbb{R}^{d_c}\)</span> (where <span class="arithmatex">\(d_c \ll H \cdot d_k\)</span>):
+  $<span class="arithmatex">\(\mathbf{c}_t^{KV} = \mathbf{x}_t \mathbf{W}_{DKV} \in \mathbb{R}^{1 \times d_c}\)</span>$
+  During attention, the latent vector is uncompressed on-the-fly or combined with the query projection via associative matrix multiplication, accompanied by a decoupled rotary positional embedding key <span class="arithmatex">\(\mathbf{k}_t^R \in \mathbb{R}^{1 \times d_R}\)</span>.</li>
+<li><strong>Memory Footprint per token</strong>:
+  $<span class="arithmatex">\(\text{Bytes/Token}_{\text{MLA}} = n_{\text{layers}} \times (d_c + d_R) \times P_{\text{bytes}}\)</span>$</li>
+<li><strong>Impact</strong>: Reduces KV-cache memory by up to <strong><span class="arithmatex">\(93\%\)</span></strong> relative to MHA, enabling massive concurrent context processing.</li>
+</ul>
+<hr />
+<h2 id="5-mathematical-sizing-memory-architecture-and-hardwaresoftware-abstraction">5. Mathematical Sizing, Memory Architecture, and Hardware/Software Abstraction<a class="headerlink" href="#5-mathematical-sizing-memory-architecture-and-hardwaresoftware-abstraction" title="Permanent link">&para;</a></h2>
+<h3 id="51-exact-sizing-formula-and-worked-example">5.1 Exact Sizing Formula and Worked Example<a class="headerlink" href="#51-exact-sizing-formula-and-worked-example" title="Permanent link">&para;</a></h3>
+<p>The total memory required to store the KV cache for a running inference engine is governed by:</p>
+<div class="arithmatex">\[\text{Memory}_{\text{KV}} = 2 \times B \times n_{\text{layers}} \times H_{KV} \times d_k \times S \times P_{\text{bytes}}\]</div>
+<p>Where:
+* <span class="arithmatex">\(2\)</span>: Stores both Key (<span class="arithmatex">\(\mathbf{K}\)</span>) and Value (<span class="arithmatex">\(\mathbf{V}\)</span>) matrices.
+* <span class="arithmatex">\(B\)</span>: Batch size (number of concurrent active sequences).
+* <span class="arithmatex">\(n_{\text{layers}}\)</span>: Total number of transformer decoder layers.
+* <span class="arithmatex">\(H_{KV}\)</span>: Number of Key/Value heads per layer.
+* <span class="arithmatex">\(d_k\)</span>: Dimensionality of each attention head (<span class="arithmatex">\(d_{\text{model}} / H_Q\)</span>).
+* <span class="arithmatex">\(S\)</span>: Sequence length (tokens in prompt + generated tokens).
+* <span class="arithmatex">\(P_{\text{bytes}}\)</span>: Storage precision in bytes (e.g., <span class="arithmatex">\(\text{FP16} = 2\)</span>, <span class="arithmatex">\(\text{FP8} = 1\)</span>, <span class="arithmatex">\(\text{INT4} = 0.5\)</span>).</p>
+<h4 id="concrete-industrial-example-llama-3-70b">Concrete Industrial Example: LLaMA-3-70B<a class="headerlink" href="#concrete-industrial-example-llama-3-70b" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Parameters: <span class="arithmatex">\(n_{\text{layers}} = 80\)</span>, <span class="arithmatex">\(H_Q = 64\)</span>, <span class="arithmatex">\(H_{KV} = 8\)</span> (GQA), <span class="arithmatex">\(d_k = 128\)</span>, Precision = FP16 (<span class="arithmatex">\(P_{\text{bytes}} = 2\)</span>).</li>
+<li>Let Batch Size <span class="arithmatex">\(B = 16\)</span>, Context Length <span class="arithmatex">\(S = 8192\)</span> (8K tokens).</li>
+</ul>
+<div class="arithmatex">\[\text{Memory per Token per Layer} = 2 \times 8 \times 128 \times 2 = 4,096 \text{ bytes} = 4 \text{ KB}\]</div>
+<div class="arithmatex">\[\text{Memory per Token across all 80 Layers} = 80 \times 4 \text{ KB} = 320 \text{ KB / token}\]</div>
+<div class="arithmatex">\[\text{Total KV Cache} = 16 \times 8192 \times 320 \text{ KB} = 41,943,040 \text{ KB} \approx \mathbf{40.0 \text{ GB}}\]</div>
+<p>At a batch size of 16 and an 8K context, the KV cache alone consumes <strong>40 GB of VRAM</strong>—half the entire memory capacity of an 80 GB NVIDIA A100 GPU!</p>
+<hr />
+<h3 id="52-gpu-memory-hierarchy-and-memory-bandwidth-wall">5.2 GPU Memory Hierarchy and Memory Bandwidth Wall<a class="headerlink" href="#52-gpu-memory-hierarchy-and-memory-bandwidth-wall" title="Permanent link">&para;</a></h3>
+<p>Understanding the performance of the KV cache requires examining how data moves through the GPU memory hierarchy during an autoregressive step:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                            GPU Memory Subsystem                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Compute Cores (SMs) ◄──► Registers (~30 TB/s, &lt;100 KB/SM)                  │
+│                                  ▲                                          │
+│                                  ▼                                          │
+│                      SRAM / L1 Cache (~19 TB/s, ~200 KB/SM)                 │
+│                                  ▲                                          │
+│                                  ▼                                          │
+│                      L2 Cache (~5-7 TB/s, 50-60 MB on H100)                 │
+│                                  ▲                                          │
+│                                  ▼ (Memory Bandwidth Bottleneck: ~3.35 TB/s)│
+│                      High Bandwidth Memory (HBM3/HBM3e)                     │
+│                      Stores: Model Weights + Massive KV-Cache               │
+└─────────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h4 id="roofline-model-the-memory-bandwidth-bottleneck">Roofline Model &amp; The Memory Bandwidth Bottleneck<a class="headerlink" href="#roofline-model-the-memory-bandwidth-bottleneck" title="Permanent link">&para;</a></h4>
+<p>During the decode phase, the arithmetic intensity is extremely low:</p>
+<div class="arithmatex">\[I_{\text{decode}} = \frac{\text{FLOPs}}{\text{Bytes Transferred}} \approx \frac{2 \times \text{Parameters} + 2 \times \text{KV\_Cache\_Size}}{\text{Model\_Size\_Bytes} + \text{KV\_Cache\_Bytes}} \approx 1 \text{ to } 2 \text{ FLOPs/Byte}\]</div>
+<p>Because modern GPUs like the NVIDIA H100 have an arithmetic intensity inflection point of <span class="arithmatex">\(\approx 150 \text{ FLOPs/Byte}\)</span>, decoding runs deep inside the <strong>Memory Bandwidth-Bound</strong> regime. Every token generated requires streaming the entire KV cache from HBM across the memory bus into on-chip SRAM registers.</p>
+<hr />
+<h3 id="53-software-abstraction-pagedattention-and-virtual-memory-management">5.3 Software Abstraction: PagedAttention and Virtual Memory Management<a class="headerlink" href="#53-software-abstraction-pagedattention-and-virtual-memory-management" title="Permanent link">&para;</a></h3>
+<p>Historically, frameworks allocated contiguous blocks of GPU memory for the maximum possible sequence length (<span class="arithmatex">\(S_{\max}\)</span>), leading to two severe memory allocation pathologies:
+1. <strong>Internal Fragmentation</strong>: Allocating memory for 4096 tokens when a request only generates 500 tokens reserves unused VRAM.
+2. <strong>External Fragmentation</strong>: Dynamic request arrivals and departures fragment physical memory, causing out-of-memory errors even when sufficient total memory is free.</p>
+<p>To solve this, <strong>PagedAttention</strong> (Kwon et al., SOSP 2023 / vLLM) adapted the classical OS concept of <strong>Virtual Memory Paging</strong> to the GPU KV cache.</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                       PagedAttention Memory Architecture                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Logical KV Cache (Continuous Sequence):                                    │
+│  [ Token 0..15 ] [ Token 16..31 ] [ Token 32..47 ] [ Token 48..63 ]        │
+│        │                 │                │                │                │
+│        ▼                 ▼                ▼                ▼                │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                          Block Page Table                             │  │
+│  │   Logical Block 0 ──► Physical Block #7  (HBM Frame 7)                │  │
+│  │   Logical Block 1 ──► Physical Block #2  (HBM Frame 2)                │  │
+│  │   Logical Block 2 ──► Physical Block #19 (HBM Frame 19)               │  │
+│  │   Logical Block 3 ──► Physical Block #4  (HBM Frame 4)                │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│        │                 │                │                │                │
+│        ▼                 ▼                ▼                ▼                │
+│  Physical GPU HBM (Non-Contiguous Allocation):                              │
+│  [ Frame 2: Block 1 ] ... [ Frame 4: Block 3 ] ... [ Frame 7: Block 0 ]     │
+└─────────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h4 id="mathematical-block-paging-mechanics">Mathematical Block Paging Mechanics<a class="headerlink" href="#mathematical-block-paging-mechanics" title="Permanent link">&para;</a></h4>
+<ol>
+<li>The logical KV cache of sequence <span class="arithmatex">\(i\)</span> is partitioned into fixed-size logical blocks of size <span class="arithmatex">\(B_{\text{block}}\)</span> (typically 16 or 32 tokens).</li>
+<li>Physical memory is pre-allocated as a pool of physical blocks.</li>
+<li>A kernel-level page table maps logical block indices to physical block frames:
+   $<span class="arithmatex">\(\text{Physical Address}(\text{token } t) = \text{Base}(\text{PageTable}[t // B_{\text{block}}]) + (t \pmod{B_{\text{block}}}) \times \text{Size}_{\text{token}}\)</span>$</li>
+<li><strong>Zero-Copy Forking &amp; Parallel Sampling</strong>: When executing beam search or multi-agent prefix sharing, child branches share parent physical block pointers via Copy-On-Write (CoW), completely eliminating redundant KV allocations.</li>
+</ol>
+<hr />
+<h2 id="6-active-research-frontiers-in-kv-cache-optimization">6. Active Research Frontiers in KV Cache Optimization<a class="headerlink" href="#6-active-research-frontiers-in-kv-cache-optimization" title="Permanent link">&para;</a></h2>
+<p>As context windows scale to 1M+ tokens and multi-agent systems proliferate, optimizing the KV cache remains one of the most active domains in deep learning research:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                    Active KV Cache Research Frontiers                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1. Extreme Quantization       2. Dynamic Eviction &amp; Sparsification         │
+│     • FP8 / INT4 / INT2            • StreamingLLM (Attention Sinks)         │
+│     • KIVI, Q-Hitter               • SnapKV, H2O (Heavy Hitters)            │
+│                                                                             │
+│  3. Architectural Latent Proj  4. Hierarchical Tiering &amp; Disaggregation     │
+│     • DeepSeek MLA                 • Mooncake (RDMA Context Fabric)         │
+│     • Cross-Layer KV Sharing       • CXL 3.0 Host Memory Offloading         │
+└─────────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="1-low-bit-quantization-fp8-int4-int2">1. Low-Bit Quantization (FP8, INT4, INT2)<a class="headerlink" href="#1-low-bit-quantization-fp8-int4-int2" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Mechanisms (KIVI, Q-Hitter)</strong>: Quantizing Key matrices per-channel and Value matrices per-token to 4-bit or 2-bit representations.</li>
+<li><strong>Challenge</strong>: Key tensors contain significant numerical outliers in specific feature dimensions. Advanced quantization applies outlier-preserving clipping and asymmetric scale factors to retain 99%+ of full FP16 perplexity.</li>
+</ul>
+<h3 id="2-context-eviction-dynamic-token-dropping">2. Context Eviction &amp; Dynamic Token Dropping<a class="headerlink" href="#2-context-eviction-dynamic-token-dropping" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Attention Sinks &amp; StreamingLLM (Xiao et al., 2023)</strong>: Discovered that preserving the initial 4 prompt tokens (the "attention sinks") alongside a sliding local window allows models to generate infinite text streams without memory overflow or perplexity spikes.</li>
+<li><strong>Heavy-Hitter Oracle (H2O) &amp; SnapKV</strong>: Analyzes attention weights in real-time to identify the critical subset of tokens that receive 95%+ of attention mass, pruning inactive intermediate tokens from the KV cache dynamically.</li>
+</ul>
+<h3 id="3-disaggregated-kv-fabrics-and-remote-rdma-paging">3. Disaggregated KV Fabrics and Remote RDMA Paging<a class="headerlink" href="#3-disaggregated-kv-fabrics-and-remote-rdma-paging" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Cross-Node KV Streaming (Mooncake, DistServe)</strong>: Streaming KV caches across InfiniBand/RoCE fabrics from dedicated prefill clusters to decode clusters.</li>
+<li><strong>Tiered CXL Memory Offloading</strong>: Using Compute Express Link (CXL 3.0) to page cold KV blocks into terabyte-scale host DDR5 memory pools, evicting them from precious GPU HBM without incurring PCIe host-orchestration stalls.</li>
+</ul>
+<hr />
+<h2 id="7-conclusion">7. Conclusion<a class="headerlink" href="#7-conclusion" title="Permanent link">&para;</a></h2>
+<p>The Key-Value (KV) Cache is an indispensable mathematical and architectural cornerstone of modern Transformer inference. By trading memory space for compute time, it fundamentally transforms the computational scaling of autoregressive generation from an intractable <span class="arithmatex">\(O(N^3)\)</span> bottleneck into a scalable <span class="arithmatex">\(O(N^2)\)</span> algorithm.</p>
+<p>However, as model sequence lengths expand into the hundreds of thousands of tokens, the memory capacity and bandwidth required to sustain the KV cache have emerged as the primary bottlenecks in AI systems engineering. Overcoming these limits has catalyzed a renaissance in hardware-software co-design:
+* <strong>Algorithmically</strong>: Through Grouped-Query Attention (GQA), Multi-Head Latent Attention (MLA), and dynamic attention-sink pruning.
+* <strong>At the Systems Level</strong>: Through PagedAttention virtual memory tables, FP8/INT4 quantization kernels, and disaggregated RDMA context streaming fabrics.</p>
+<p>Understanding and innovating across the mathematical, architectural, and memory-hierarchy dimensions of the KV cache will remain a defining imperative for engineers building the next generation of ultra-low-latency, long-context artificial intelligence systems.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+      
+        <script src="../javascripts/math.js"></script>
+      
+    
+  </body>
+</html>

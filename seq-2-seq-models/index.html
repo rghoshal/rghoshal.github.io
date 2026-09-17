@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../future-of-llm-inference/">
+        <link rel="prev" href="../rlhf/">
       
       
-        <link rel="next" href="../kv-cache/">
+        <link rel="next" href="../tokenization/">
       
       
         
@@ -357,6 +357,114 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../inside-llm-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inside an LLM Inference Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Mechanics, Mathematics, and Hardware Architecture of Key-Value (KV) Caching in Large Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Mathematics, Algorithms, and Hardware Mechanics of LLM Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rlhf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforcement Learning from Human Feedback (RLHF): Aligning Large Language Models for Precision, Safety, and Reasoning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -478,114 +586,6 @@
   
 </nav>
       
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../kv-cache/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    The Mechanics, Mathematics, and Hardware Architecture of Key-Value (KV) Caching in Large Language Models
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../llm-quantization/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    The Mathematics, Algorithms, and Hardware Mechanics of LLM Quantization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../rlhf/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reinforcement Learning from Human Feedback (RLHF): Aligning Large Language Models for Precision, Safety, and Reasoning
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../seq-2-seq-models/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Inside an LLM Inference Engine
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -782,31 +782,14 @@
 <p>By the end of this article, you should understand:</p>
 <ul>
 <li>How an LLM interprets a user prompt.</li>
-<li>How does a tokenizer help in granularizing context </li>
-<li>How does position encoding help to assign significance to meanings
-  of tokens based on their position</li>
-<li>How does KV kache help in optimizing the time to arrive at an
-  inference. </li>
-<li>How does the attention mechanism help to spread up and synchronize
-  at the same time , the resources and computational power to 
-  compute the next token.</li>
-<li>How does usage of a Multi Layer Perceptron improve the performance
-  of a deep learning pipeline with respect to multi-layer neural
-  networks ?</li>
-<li>How does residual connections help to bypass several layers of a
-  neural netwoork with several hidden layers in order to diminish
-  the effects of vanishing gradients ?</li>
-<li>How does Root Mean Square ( RMSNorm ) help to preserve the 
-  performance of a deeply-busy deep learning pipeline ?</li>
-<li>How does logits help to compute the probility of of deep learning
-  model thereby helping in computing attention scores ?</li>
-<li>How does different sampling procedures help to choose the 
-  appropriate next token from the logits.</li>
-<li>How does Decoders (Decoding) help to generate the final output
-  for a transformer model</li>
-<li>How is precisely the next token generated ? </li>
-<li>How does the model help to tackle repetition in contexts by 
-  applying novel procedures ?</li>
+<li>Why Transformers replaced earlier sequence models.</li>
+<li>The limitations of CNNs, RNNs, LSTMs, and GRUs.</li>
+<li>The motivation behind the Transformer architecture.</li>
+<li>How the self-attention mechanism works.</li>
+<li>How Query, Key, and Value vectors are computed.</li>
+<li>How scaled dot-product attention is calculated.</li>
+<li>Why multi-head attention is necessary.</li>
+<li>How positional encoding preserves word order.</li>
 </ul>
 <hr />
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
@@ -824,18 +807,16 @@
 <ol>
 <li>Background</li>
 <li>Natural Language Understanding</li>
-<li>Multi Layer Perceptrons</li>
-<li>Feed Forward Neural Network</li>
-<li>Backpropagation in Neural Networks</li>
-<li>Encoders and Decoders</li>
+<li>Evolution of Sequence Models</li>
+<li>Convolutional Neural Networks (CNN)</li>
+<li>Recurrent Neural Networks (RNN)</li>
+<li>Long Short-Term Memory (LSTM)</li>
+<li>Gated Recurrent Units (GRU)</li>
+<li>Bidirectional LSTM</li>
 <li>Transformers</li>
-<li>Tokenizers</li>
-<li>Embedding Lookup</li>
+<li>Self-Attention</li>
+<li>Multi-Head Attention</li>
 <li>Positional Encoding</li>
-<li>Attention</li>
-<li>Multi Headed Attention</li>
-<li>Q-K-V Mechanism - Attention Scores</li>
-<li>Multi Layer Perceptrons</li>
 <li>Summary</li>
 <li>References</li>
 </ol>
