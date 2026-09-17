@@ -20,31 +20,14 @@ Rather than treating an LLM as a mysterious black box, we will gradually uncover
 By the end of this article, you should understand:
 
 - How an LLM interprets a user prompt.
-- How does a tokenizer help in granularizing context 
-- How does position encoding help to assign significance to meanings
-  of tokens based on their position
-- How does KV kache help in optimizing the time to arrive at an
-  inference. 
-- How does the attention mechanism help to spread up and synchronize
-  at the same time , the resources and computational power to 
-  compute the next token.
-- How does usage of a Multi Layer Perceptron improve the performance
-  of a deep learning pipeline with respect to multi-layer neural
-  networks ?
-- How does residual connections help to bypass several layers of a
-  neural netwoork with several hidden layers in order to diminish
-  the effects of vanishing gradients ?
-- How does Root Mean Square ( RMSNorm ) help to preserve the 
-  performance of a deeply-busy deep learning pipeline ?
-- How does logits help to compute the probility of of deep learning
-  model thereby helping in computing attention scores ?
-- How does different sampling procedures help to choose the 
-  appropriate next token from the logits.
-- How does Decoders (Decoding) help to generate the final output
-  for a transformer model
-- How is precisely the next token generated ? 
-- How does the model help to tackle repetition in contexts by 
-  applying novel procedures ?
+- Why Transformers replaced earlier sequence models.
+- The limitations of CNNs, RNNs, LSTMs, and GRUs.
+- The motivation behind the Transformer architecture.
+- How the self-attention mechanism works.
+- How Query, Key, and Value vectors are computed.
+- How scaled dot-product attention is calculated.
+- Why multi-head attention is necessary.
+- How positional encoding preserves word order.
 
 ---
 
@@ -66,20 +49,18 @@ No prior knowledge of Transformers is required.
 
 1. Background
 2. Natural Language Understanding
-3. Multi Layer Perceptrons
-4. Feed Forward Neural Network
-5. Backpropagation in Neural Networks
-6. Encoders and Decoders
-7. Transformers
-8. Tokenizers
-9. Embedding Lookup
-10. Positional Encoding
-11. Attention
-12. Multi Headed Attention
-13. Q-K-V Mechanism - Attention Scores
-14. Multi Layer Perceptrons
-15. Summary
-16. References
+3. Evolution of Sequence Models
+   - Convolutional Neural Networks (CNN)
+   - Recurrent Neural Networks (RNN)
+   - Long Short-Term Memory (LSTM)
+   - Gated Recurrent Units (GRU)
+   - Bidirectional LSTM
+4. Transformers
+5. Self-Attention
+6. Multi-Head Attention
+7. Positional Encoding
+8. Summary
+9. References
 
 ---
 
